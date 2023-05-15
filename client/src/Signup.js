@@ -8,51 +8,67 @@ export default function Signup() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isValidSignUp, setIsValidSignUp] = useState(false);
 
-  const temp_database = [
-    {
-      useremail: "user1@gmail.com",
-      username: "user1",
-      password: "pass1"
-    },
-    {
-      useremail: "user2@gmail.com",
-      username: "user2",
-      password: "pass2"
-    }
-  ];
   const signup_errors = {
     email: "Email already in use. ",
     uname: "Username already in use. "
-    
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
+    
     //Prevent page reload
     event.preventDefault();
-    console.log(document.forms[0])
     var { email, uname, pass} = document.forms[0];
-    
-    // Find user login info
-    // console.log("1name: ", uname.value)
-    // console.log("1email: ", email.value)
-    const userEmailData = temp_database.find((user) => user.useremail == email.value);
-    const userNameData = temp_database.find((user) => user.username == uname.value);
-    // console.log("email: ", userEmailData)
-    // console.log("name: ", userNameData)
+
+    // Make get request to find user with specific username
+    const usernameResp = await fetch(`http://localhost:5050/record/user/username/${uname.value}`);
+    const emailResp = await fetch(`http://localhost:5050/record/user/email/${email.value}`);
+
+    if (!usernameResp.ok){
+      const message = `An error has occured: ${usernameResp.statusText}`;
+      window.alert(message);
+      return;
+    }
+
+    if(!emailResp.ok){
+      const message = `An error has occurred: ${emailResp.statusText}`;
+      window.alert(message);
+      return;
+    }
 
     // Compare user info
-      if (userEmailData) {
-        // Email already in use
-        console.log("fojefifis")
-        setErrorMessages({ name: "err_email", message: signup_errors.email });
-      } 
-      else if (userNameData){
-        // Username already in use
-        setErrorMessages({ name: "err_name", message: signup_errors.uname });
-      }else {
-        setIsValidSignUp(true);
-        /*store in database needs to be implemented */
-      }
+    if (await emailResp.text() !== "Not found") {
+      // Email already in use
+      console.log("fojefifis")
+      setErrorMessages({ name: "err_email", message: signup_errors.email });
+    } 
+    else if (await usernameResp.text() !== "Not found"){
+      // Username already in use
+      setErrorMessages({ name: "err_name", message: signup_errors.uname });
+    }else {
+      setIsValidSignUp(true);
+
+      // Need to make POST request to database
+
+      // User Structure
+      const newUser = {
+        username: uname.value,
+        password: pass.value,
+        email: email.value
+      };
+
+      // POST request
+      await fetch("http://localhost:5050/record", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      })
+      .catch(error => {
+        window.alert(error);
+        return;
+      });
+    }
   };
 
   // Generate JSX code for error message

@@ -7,29 +7,32 @@ export default function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const temp_database = [
-    {
-      username: "user1",
-      password: "pass1"
-    },
-    {
-      username: "user2",
-      password: "pass2"
-    }
-  ];
   const login_errors = {
     uname: "Invalid username",
     pass: "Invalid password"
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     //Prevent page reload
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
 
     // Find user login info
-    const userData = temp_database.find((user) => user.username === uname.value);
+    const usernameResp = await fetch(`http://localhost:5050/record/user/username/${uname.value}`);
+
+    if (!usernameResp.ok){
+      const message = `An error has occured: ${usernameResp.statusText}`;
+      window.alert(message);
+      return;
+    }
+
+    let userData;
+    try{
+      userData = await usernameResp.json();
+    } catch (e) {
+      console.error(e);
+    }
 
     // Compare user info
     if (userData) {
