@@ -1,0 +1,46 @@
+.HomeScreen{
+    height: 100vh;
+    width: 100vw;
+    outline: 2px solid purple;
+    display: flex;
+    flex-direction: column;
+}
+
+.ListScreens{
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+.ToPayScreen{
+    left: 0;
+    height: 100%;
+    width: 50%;
+    align-items: center;
+    outline: 1px solid purple;
+}
+.ToBePaidScreen{
+
+    height: 100%;
+    width: 50%;
+    align-items: center;
+    outline: 1px solid purple;
+    right: 0;
+}
+
+.listContent{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    outline: 1px solid purple;
+}
+ul{
+    list-style: none;
+}
+li{
+    border: 1px solid purple;
+    border-radius: 20;
+    height: 10%;
+    width: 100%;
+}
+
