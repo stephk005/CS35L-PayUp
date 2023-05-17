@@ -1,31 +1,68 @@
-.title {
-  margin-top: 10vh;
-  font-family: verdana;
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 20px;
+.group {
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  /* gap: 20px; */
+  height: 100vh;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 
-.transaction-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+input[type="submit"] {
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  background: #01d28e;
+  border: 1px solid #01d28e;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+input[type="submit"]:hover {
+  background: #6cf0c2;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
 }
 
 .transaction {
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+  background-color: rgb(231, 221, 254);
+  padding: 2rem;
+  width: 150vh;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.transaction .lender {
+  font-weight: bold;
+  color: blue;
+}
+
+.transaction .borrower {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.list-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid #ccc;
 }
 
-.transaction .description {
-  font-weight: bold;
-  margin-right: 12px;
+.error {
+  color: red;
+  font-size: 12px;
 }
 
-.transaction .amount {
-  font-weight: bold;
-  color: #ff2e63;
+.title {
+  font-size: 25px;
+  margin-top: 20px;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px;
 }
