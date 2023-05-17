@@ -10,6 +10,7 @@
     height: 100%;
     width: 100%;
     display: flex;
+    
 }
 .ToPayScreen{
     left: 0;
@@ -26,19 +27,30 @@
     outline: 1px solid purple;
     right: 0;
 }
+.FriendsGroupsScreen{
 
+    height: 100%;
+    width: 50%;
+    align-items: center;
+    outline: 1px solid purple;
+    right: 0;
+    align-items: center;
+    justify-content: center;
+}
 .listContent{
     display: flex;
     flex-direction: column;
     align-items: start;
     justify-content: center;
+    /* margin: 1rem; */
     outline: 1px solid purple;
 }
 ul{
     list-style: none;
 }
+
 li{
-    border: 1px solid purple;
+    /* border: 1px solid purple; */
     border-radius: 20;
     height: 10%;
     width: 100%;

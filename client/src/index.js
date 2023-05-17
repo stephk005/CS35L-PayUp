@@ -5,6 +5,7 @@ import Login from './Login';
 import Welcome from './Welcome';
 import App from './App'
 import Header from './Header';
+import HomeHeader from './HomeHeader'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,6 +14,7 @@ root.render(
     {/* <Welcome /> */}
     {/* <Header /> */}
     <App />
+    {/* <HomeHeader /> */}
 
   </React.StrictMode>
 );

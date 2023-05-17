@@ -5,6 +5,7 @@ import Signup from './Signup';
 import Group from './Group';
 import NewGroup from './NewGroup';
 import Home from './Home'
+import Profile from './Profile';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route exact path="/Group" element={<Group/>}/>
         <Route exact path="/NewGroup" element={<NewGroup/>}/>
         <Route exact path="/Home" element={<Home/>}/>
+        <Route exact path="/Profile" element={<Profile/>}/>
       </Routes>
     </Router>
   );

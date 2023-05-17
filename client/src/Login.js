@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./Login.css";
 import Header from "./Header";
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const login_errors = {
     uname: "Invalid username",
@@ -81,7 +83,8 @@ export default function Login() {
       <div className="login">
         <div className="login-form">
           <div className="title">Sign In</div>
-          {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
+          {/* {isSubmitted ? <div>User is successfully logged in</div> : renderForm} */}
+          {isSubmitted ? navigate("/Home") : renderForm}
         </div>
       </div>
     </div>

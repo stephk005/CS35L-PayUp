@@ -1,8 +1,8 @@
-.header {
+.homeheader {
     display: flex;
     align-items: center;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     height: 100px;
     background-color: #54bb97;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -12,21 +12,23 @@
     padding-inline: 3rem;
   }
 
-  .header_welcome {
-    display: flex;
-    flex: 1
-  }
-
-  .header_login_link {
-    display: flex;
-    margin-right: 3rem;
-  }
-
-  .header_signup_link {
+  .homeheader_welcome {
     display: flex;
   }
 
-.header_link {
+
+  .homeheader_balance {
+    display: flex;
+  }
+  .homeheader_tempgroup_link {
+    display: flex;
+  }
+
+  .homeheader_profile_link {
+    display: flex;
+  }
+
+.homeheader_link {
     color:white;
     text-decoration: none;
 

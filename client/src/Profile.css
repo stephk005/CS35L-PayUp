@@ -1,0 +1,23 @@
+.profile {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #a597ec;
+  }
+
+  .profileinfo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .signout{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .signout_link{
+    color:white;
+    text-decoration: none;
+  }

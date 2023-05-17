@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import "./Login.css";
 import "./Signup.css"
 import Header from "./Header";
-
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isValidSignUp, setIsValidSignUp] = useState(false);
+  const navigate = useNavigate();
 
   const signup_errors = {
     email: "Email already in use. ",
@@ -108,7 +109,8 @@ export default function Signup() {
       <div className="login">
         <div className="login-form">
           <div className="title">Sign Up</div>
-          {isValidSignUp ? <div>User is successfully signed up</div> : renderForm}
+          {/* {isValidSignUp ? <div>User is successfully signed up</div> : renderForm} */}
+          {isValidSignUp ? navigate("/Home") : renderForm}
         </div>
       </div>
     </div>

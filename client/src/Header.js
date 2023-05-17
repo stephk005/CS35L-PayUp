@@ -7,14 +7,14 @@ export default function Header() {
 
     return (
         <div className="header">
-            <div className="home">
-            <Link className = "link" to="/Home">Home</Link>
+            <div className="header_welcome">
+            <Link className = "header_link" to="/">Welcome</Link>
             </div>
-            <div className="login_link">
-            <Link className = "link" to="/Login">Log in</Link>
+            <div className="header_login_link">
+            <Link className = "header_link" to="/Login">Log in</Link>
             </div>
-            <div className="signup_link">
-            <Link className = "link" to="/Signup">Sign up</Link>
+            <div className="header_signup_link">
+            <Link className = "header_link" to="/Signup">Sign up</Link>
             </div>
         </div>
           
