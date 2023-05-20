@@ -67,7 +67,10 @@ export default function Group() {
     <Header/>
     <div className="group">
       <div className="title">{groupname}</div>
-      {renderTransactions};
+      {renderTransactions}
+      <a href="http://localhost:3000/Group/New">
+        <button className="new-group-button">New Group</button>
+      </a>
     </div>
   </div>
   );

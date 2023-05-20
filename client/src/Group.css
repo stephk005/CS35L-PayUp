@@ -8,8 +8,9 @@
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 
-input[type="submit"] {
+.new-group-button {
   margin-top: 10px;
+  margin-left: auto;
   cursor: pointer;
   font-size: 15px;
   background: #01d28e;
@@ -18,13 +19,13 @@ input[type="submit"] {
   padding: 10px 20px;
 }
 
-input[type="submit"]:hover {
+.new-group-button:hover {
   background: #6cf0c2;
 }
 
 .button-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end; /* Updated: justify content to flex-end */
 }
 
 .transaction {

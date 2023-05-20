@@ -15,7 +15,7 @@ export default function App() {
         <Route exact path="/Login" element={<Login/>}/>
         <Route exact path="/Signup" element={<Signup/>}/>
         <Route exact path="/Group" element={<Group/>}/>
-        <Route exact path="/NewGroup" element={<NewGroup/>}/>
+        <Route exact path="/Group/New" element={<NewGroup/>}/>
         <Route exact path="/Home" element={<Home/>}/>
         <Route exact path="/Profile" element={<Profile/>}/>
       </Routes>

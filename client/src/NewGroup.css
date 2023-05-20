@@ -6,22 +6,37 @@
   /* gap: 20px; */
   height: 100vh;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  background-color: #a597ec;
+  background-color: #fff;
 }
 
-/* implement as drop down menu later? */
-.add-friends-button {
-  background-color: #01d28e;
-  color: white;
-  padding: 14px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
+.dropdown-container {
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-right: 10px;
 }
 
-/* Show the dropdown menu on button click */
-.show {
+.dropdown-menu {
+  border: 1px solid #ccc;
+  padding: 16px;
+  background-color: #f9f9f9;
+  top: 100px;
+  right: 0;
+}
+
+.dropdown-menu label {
   display: block;
+  margin-bottom: 8px;
+}
+
+.dropdown-menu input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.selected-friends {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
 }
 
 input[type="text"],
@@ -29,7 +44,6 @@ input[type="groupname"] {
   height: 25px;
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
-
 
 input[type="submit"] {
   margin-top: 10px;
