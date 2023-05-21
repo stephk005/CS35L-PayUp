@@ -9,21 +9,26 @@ export default function Home(){
             <HomeHeader/>
              <div className="ListScreens">
                 <div className="ToPayScreen">
-                    <div className="listContent">
-                        <ul  className="toPayList">{loadToPayList()}</ul>
+                    <label> Current Transactions To Pay</label>
+                    <div className="ListContent">
+                        <ul  className="payList">{loadToPayList()}</ul>
                     </div>
                 </div>
                 <div className="ToBePaidScreen">
-                    <div className="listContent">
-                        <ul className="toBePaidList">{loadToBePaidList()}</ul>
+                    <label>Current Transactions To Be Paid</label>
+                    <div className="ListContent">
+                        <ul className="payList">{loadToBePaidList()}</ul>
                     </div>
                 </div>
                 <div className="FriendsGroupsScreen">
-                <div className="listContent">
-                    <label>Friends</label>
-                        <ul className="toBePaidList">{loadToBePaidList()}</ul> 
+                    <label>Friends </label>
+                    <div className="FriendsListContent">
+                            <ul className="friendsList">{loadFriendsList()}</ul> 
                     </div>
                     <label>Groups</label>
+                    <div className="FriendsListContent">
+                            <ul className="friendsList">{loadGroupsList()}</ul> 
+                    </div>
                 </div>
             </div> 
         </div>
@@ -34,7 +39,15 @@ export default function Home(){
 function loadToBePaidList(){
     let array = [1,2,3,4,5,6,7,8,9,0]
     return array.map((array)=>{
-        return <li>{"list entry: "+array}</li>
+        return <button className="PayLi">
+            <label className="Friend_Name">
+                {"Friend: "+array}
+            </label>
+            <label className="Amount">
+                Amount: {array}
+            </label>
+        
+        </button>
     })
 
 }
@@ -42,7 +55,42 @@ function loadToBePaidList(){
 function loadToPayList(){
     let array = [1,2,3,4,5,6,7,8,9,0]
     return array.map((array)=>{
-        return <li>{"list entry: "+array}</li>
+        return <button className="PayLi">
+            <label className="Friend_Name">
+                {"Friend: "+array}
+            </label>
+            <label className="Amount">
+                Amount: {array}
+            </label>
+        
+        </button>
+    })
+
+}
+
+function loadGroupsList(){
+    let array = [1,2,3,4,5,6,7,8,9,0]
+    return array.map((array)=>{
+        return <button className="FriendLi">
+            <label className="Friend">
+                {"Friend: "+array}
+            </label>
+        
+        </button>
+    })
+
+}
+
+function loadFriendsList(){
+
+    let array = [1,2,3,4,5,6,7,8,9,0]
+    return array.map((array)=>{
+        return <button className="FriendLi">
+            <label className="Friend">
+                {"Friend: "+array}
+            </label>
+        
+        </button>
     })
 
 }
