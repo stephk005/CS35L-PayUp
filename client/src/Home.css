@@ -55,6 +55,8 @@
     overflow: auto;
 }
 
+
+
 .ListContent{
     display: flex;
     flex-direction: column;
@@ -96,13 +98,19 @@
 
 .Friend_Name{
     height: 100%;
-    width: 70%;
+    width: 40%;
     outline: 1px solid purple;
+
+}
+.To_Friend{
+
+    height: 100%;
+    width: 30%;
 
 }
 .Friend{
     height: 100%;
-    width: 100%;
+    width: 70%;
     outline: 1px solid purple;
 
 }

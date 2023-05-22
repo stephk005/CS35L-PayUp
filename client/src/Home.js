@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./Home.css"
 import Header from "./Header";
 import HomeHeader from "./HomeHeader";
+import { Link } from "react-router-dom";
+
 
 export default function Home(){
     return (
@@ -32,8 +34,7 @@ export default function Home(){
                 </div>
             </div> 
         </div>
-    )
-    }
+    )}
 
 
 function loadToBePaidList(){
@@ -46,6 +47,7 @@ function loadToBePaidList(){
             <label className="Amount">
                 Amount: {array}
             </label>
+            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
         
         </button>
     })
@@ -62,6 +64,7 @@ function loadToPayList(){
             <label className="Amount">
                 Amount: {array}
             </label>
+            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
         
         </button>
     })
@@ -75,6 +78,7 @@ function loadGroupsList(){
             <label className="Friend">
                 {"Friend: "+array}
             </label>
+            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
         
         </button>
     })
@@ -89,6 +93,8 @@ function loadFriendsList(){
             <label className="Friend">
                 {"Friend: "+array}
             </label>
+            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+
         
         </button>
     })
