@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../db/conn.mjs";
-import { TopologyDescription } from "mongodb";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ router.get('/user', async (req, res) => {
 // Allows you to fetch a user based on their id
 router.get("/user/:id", async (req, res) => {
   let collection = await db.collection("users");
-  let query = {_id: req.params.id};
+  let query = {_id:  new ObjectId(req.params.id)};
   let result = await collection.findOne(query);
 
   if (result) res.send(result).status(200);
@@ -98,19 +98,14 @@ router.get("/user/email/:email", async (req, res) => {
 
 // Allows creation of a new user
 router.post("/user/create", async (req, res) => {
-  let newUser;
-  try{
-    newUser = {
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
-      groups: req.body.groups,  // list of _id (groups)
-      friends: req.body.friends  // list of _id (users)
-    };
-  } catch(e) {
-    res.send("KEY_ERROR").status(400); // The correct keys were not found
-    return;
-  }
+
+  let newUser = {
+    username: req.body.username,
+    password: req.body.password,
+    email: req.body.email,
+    groups: req.body.groups,  // list of _id (groups)
+    friends: req.body.friends  // list of _id (users)
+  };
 
   let collection = await db.collection("users");
   let result = await collection.insertOne(newUser);
@@ -120,10 +115,70 @@ router.post("/user/create", async (req, res) => {
 });
 
 
+// Allows addition of new friend (should pass user ID)
+router.patch("/user/insert/friend/:id", async (req, res) => {
+
+  let friendID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$push: {friends: friendID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.send("SUCCESS").status(201);
+  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+});
+
+
+// Allows addition of new group (should pass user ID)
+router.patch("/user/insert/group/:id", async (req, res) => {
+
+  let groupID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$push: {groups: groupID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.send("SUCCESS").status(201);
+  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+});
+
+
+// Allows removal of friend (should pass user ID)
+router.patch("/user/pop/friend/:id", async (req, res) => {
+
+  let friendID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$pull: {friends: friendID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.send("SUCCESS").status(201);
+  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+});
+
+
+// Allows removal of group (should pass user ID)
+router.patch("/user/pop/group/:id", async (req, res) => {
+
+  let groupID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$pull: {groups: groupID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.send("SUCCESS").status(201);
+  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+});
+
+
 // Allows deletion of a user
 router.delete("/user/delete/:id", async (req, res) => {
   let collection = await db.collection("users");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
   if(result) res.send("SUCCESS").status(200)
@@ -147,7 +202,7 @@ router.get('/group', async (req, res) => {
 // Allows you to fetch a group based on its id
 router.get("/group/:id", async (req, res) => {
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.findOne(query);
 
   if (result) res.send(result).status(200);
@@ -158,17 +213,11 @@ router.get("/group/:id", async (req, res) => {
 // Allows creation of a new group
 router.post("/group/create", async (req, res) => {
 
-  let newGroup;
-  try {
-    newGroup = {
-      name: req.body.name,
-      members: req.body.members,  // list of _id (users)
-      transactions: req.body.transactions  // list of _id (transactions)
-    };
-  } catch(e) {
-    res.send("KEY_ERROR").status(400); // The correct keys were not found
-    return;
-  }
+  let newGroup = {
+    name: req.body.name,
+    members: req.body.members,  // list of _id (users)
+    transactions: req.body.transactions  // list of _id (transactions)
+  };
 
   let collection = await db.collection("groups");
   let result = await collection.insertOne(newGroup);
@@ -178,19 +227,13 @@ router.post("/group/create", async (req, res) => {
 });
 
 
-// Allows insertion of new user into group (should pass user ID)
+// Allows insertion of new member into group (should pass user ID)
 router.patch("/group/insert/user/:id", async (req, res) => {
 
-  let userID;
-  try{
-    userID = req.body.id;
-  } catch(e){
-    res.send("KEY_ERROR").status(400); // ID missing
-    return;
-  }
+  let userID = req.body.id;
 
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let arrayAction = {$push: {members: userID}};
   let result = await collection.updateOne(query, arrayAction);
 
@@ -202,58 +245,40 @@ router.patch("/group/insert/user/:id", async (req, res) => {
 // Allows insertion of new transaction into group (should pass transaction ID)
 router.patch("/group/insert/transaction/:id", async (req, res) => {
 
-  let transactionID;
-  try{
-    transactionID = req.body.id;
-  } catch(e){
-    res.send("KEY_ERROR").status(400); // ID missing
-    return;
-  }
+  let transactionID = req.body.id;
 
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let arrayAction = {$push: {transactions: transactionID}};
   let result = await collection.updateOne(query, arrayAction);
 
   if(result) res.send("SUCCESS").status(201);
-  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+  else res.send("INSERT_ERROR").status(500);  // Removal failed for other reason
 });
 
 
-// Allows removal of user from group (should pass user ID)
+// Allows removal of member from group (should pass user ID)
 router.patch("/group/pop/user/:id", async (req, res) => {
 
-  let userID;
-  try{
-    userID = req.body.id;
-  } catch(e){
-    res.send("KEY_ERROR").status(400); // ID missing
-    return;
-  }
+  let userID = req.body.id;
 
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
-  let arrayAction = {$pull: {users: userID}};
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$pull: {members: userID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+  if(result.acknowledged) res.send("SUCCESS").status(201);
+  else res.send("POP_ERROR").status(500);  // Removal failed for other reason
 });
 
 
 // Allows removal of transaction from group (should pass transaction ID)
 router.patch("/group/pop/transaction/:id", async (req, res) => {
 
-  let transactionID;
-  try{
-    transactionID = req.body.id;
-  } catch(e){
-    res.send("KEY_ERROR").status(400); // ID missing
-    return;
-  }
+  let transactionID = req.body.id;
 
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let arrayAction = {$pull: {transactions: transactionID}};
   let result = await collection.updateOne(query, arrayAction);
 
@@ -265,7 +290,7 @@ router.patch("/group/pop/transaction/:id", async (req, res) => {
 // Allows deletion of a group
 router.delete("/group/delete/:id", async (req, res) => {
   let collection = await db.collection("groups");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
   if(result) res.send("SUCCESS").status(200)
@@ -289,7 +314,7 @@ router.get('/transaction', async (req, res) => {
 // Allows you to fetch a transaction based on its ID
 router.get("/transaction/:id", async (req, res) => {
   let collection = await db.collection("transactions");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.findOne(query);
 
   if (!result) res.send("FETCH_ERROR").status(404);  // Not found
@@ -297,21 +322,15 @@ router.get("/transaction/:id", async (req, res) => {
 });
 
 
-// Allows creation of a new transaction
+// Allows creation of a  transaction
 router.post("/transaction/create", async (req, res) => {
 
-  let newTransaction;
-  try {
-    newTransaction = {
-      name: req.body.name,
-      loaner: req.body.loaner,  // _id
-      borrower: req.body.borrower,  // _id
-      amount: req.body.amount  // double
-    };
-  } catch(e) {
-    res.send("KEY_ERROR").status(400); // The correct keys were not found
-    return;
-  }
+  let newTransaction = {
+    name: req.body.name,
+    loaner: req.body.loaner,  // _id
+    borrower: req.body.borrower,  // _id
+    amount: req.body.amount  // double
+  };
 
   let collection = await db.collection("transactions");
   let result = await collection.insertOne(newTransaction);
@@ -324,16 +343,10 @@ router.post("/transaction/create", async (req, res) => {
 // Allows update of transaction amount
 router.patch("/transaction/update/:id", async (req, res) => {
 
-  let updatedAmount;
-  try{
-    updatedAmount = req.body.amount;
-  } catch(e){
-    res.send("KEY_ERROR").status(400); // ID missing
-    return;
-  }
+  let updatedAmount = req.body.amount;
 
   let collection = await db.collection("transactions");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let updateAction = {$set: {amount: updatedAmount}};
   let result = await updateOne(query, updateAction)
   
@@ -345,7 +358,7 @@ router.patch("/transaction/update/:id", async (req, res) => {
 // Allows deletion of a transaction
 router.delete("/transaction/delete/:id", async (req, res) => {
   let collection = await db.collection("transactions");
-  let query = {_id: req.params.id};
+  let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
   if(result) res.send("SUCCESS").status(200)
