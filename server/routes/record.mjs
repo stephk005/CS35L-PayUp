@@ -16,6 +16,10 @@ const router = express.Router();
     Retrieve user via username: /user/username/:username
     Retrieve user via email: /user/email/:email
     Create new user: /user/create
+    Insert new friend: /group/insert/friend/:user_id
+    Insert new group: /group/insert/group/:user_id
+    Pop friend: /group/pop/friend/:user_id
+    Pop group: /group/pop/group/:user_id
     Delete user: /user/delete/:user_id
 
   GROUP:
@@ -67,7 +71,8 @@ router.get('/user', async (req, res) => {
 router.get("/user/:id", async (req, res) => {
   let collection = await db.collection("users");
   let query = {_id:  new ObjectId(req.params.id)};
-  let result = await collection.findOne(query);
+  let projection = {_id: 1};
+  let result = await collection.findOne(query, projection);
 
   if (result) res.send(result).status(200);
   else res.send("FETCH_ERROR").status(404);  // Not found
@@ -78,7 +83,8 @@ router.get("/user/:id", async (req, res) => {
 router.get("/user/username/:username", async (req, res) => {
   let collection = await db.collection("users");
   let query = {username: req.params.username};
-  let result = await collection.findOne(query);
+  let projection = {_id: 1};
+  let result = await collection.findOne(query, projection);
 
   if (result) res.send(result).status(200);
   else res.send("FETCH_ERROR").status(404);  // Not found
@@ -89,7 +95,8 @@ router.get("/user/username/:username", async (req, res) => {
 router.get("/user/email/:email", async (req, res) => {
   let collection = await db.collection("users");
   let query = {email: req.params.email};
-  let result = await collection.findOne(query);
+  let projection = {_id: 1};
+  let result = await collection.findOne(query, projection);
 
   if (result) res.send(result).status(200);
   else res.send("FETCH_ERROR").status(404);  // Not found
@@ -106,6 +113,11 @@ router.post("/user/create", async (req, res) => {
     groups: req.body.groups,  // list of _id (groups)
     friends: req.body.friends  // list of _id (users)
   };
+
+  if(Object.values(newUser).includes(undefined)){
+    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    return;
+  }
 
   let collection = await db.collection("users");
   let result = await collection.insertOne(newUser);
@@ -203,7 +215,8 @@ router.get('/group', async (req, res) => {
 router.get("/group/:id", async (req, res) => {
   let collection = await db.collection("groups");
   let query = {_id: new ObjectId(req.params.id)};
-  let result = await collection.findOne(query);
+  let projection = {_id: 1};
+  let result = await collection.findOne(query, projection);
 
   if (result) res.send(result).status(200);
   else res.send("FETCH_ERROR").status(404);  // Not found
@@ -218,6 +231,11 @@ router.post("/group/create", async (req, res) => {
     members: req.body.members,  // list of _id (users)
     transactions: req.body.transactions  // list of _id (transactions)
   };
+
+  if(Object.values(newGroup).includes(undefined)){
+    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    return;
+  }
 
   let collection = await db.collection("groups");
   let result = await collection.insertOne(newGroup);
@@ -315,7 +333,8 @@ router.get('/transaction', async (req, res) => {
 router.get("/transaction/:id", async (req, res) => {
   let collection = await db.collection("transactions");
   let query = {_id: new ObjectId(req.params.id)};
-  let result = await collection.findOne(query);
+  let projection = {_id: 1};
+  let result = await collection.findOne(query, projection);
 
   if (!result) res.send("FETCH_ERROR").status(404);  // Not found
   else res.send(result).status(200);
@@ -331,6 +350,11 @@ router.post("/transaction/create", async (req, res) => {
     borrower: req.body.borrower,  // _id
     amount: req.body.amount  // double
   };
+
+  if(Object.values(newTransaction).includes(undefined)){
+    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    return;
+  }
 
   let collection = await db.collection("transactions");
   let result = await collection.insertOne(newTransaction);
