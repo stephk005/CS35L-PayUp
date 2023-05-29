@@ -16,10 +16,10 @@ const router = express.Router();
     Retrieve user via username: /user/username/:username
     Retrieve user via email: /user/email/:email
     Create new user: /user/create
-    Insert new friend: /group/insert/friend/:user_id
-    Insert new group: /group/insert/group/:user_id
-    Pop friend: /group/pop/friend/:user_id
-    Pop group: /group/pop/group/:user_id
+    Insert new friend: /user/insert/friend/:user_id
+    Insert new group: /user/insert/group/:user_id
+    Pop friend: /user/pop/friend/:user_id
+    Pop group: /user/pop/group/:user_id
     Delete user: /user/delete/:user_id
 
   GROUP:
@@ -50,7 +50,7 @@ router.get('/stats', async(req, res) => {
   for(const col of collection_list)
     console.log(`Collection ${col.collectionName} has ${(await col.estimatedDocumentCount())} entries`);
   
-  res.send("Received").status(200);
+  res.status(200).send("Received");
 });
 
 
@@ -63,7 +63,7 @@ router.get('/user', async (req, res) => {
   let results = await collection.find({}).toArray();
 
   console.log(results);
-  res.send(results).status(200);
+  res.status(200).send(results);
 });
 
 
@@ -74,8 +74,8 @@ router.get("/user/:id", async (req, res) => {
   let projection = {_id: 1};
   let result = await collection.findOne(query, projection);
 
-  if (result) res.send(result).status(200);
-  else res.send("FETCH_ERROR").status(404);  // Not found
+  if (result) res.status(200).send(result);
+  else res.status(404).send("FETCH_ERROR");  // Not found
 });
 
 
@@ -86,8 +86,8 @@ router.get("/user/username/:username", async (req, res) => {
   let projection = {_id: 1};
   let result = await collection.findOne(query, projection);
 
-  if (result) res.send(result).status(200);
-  else res.send("FETCH_ERROR").status(404);  // Not found
+  if (result) res.status(200).send(result);
+  else res.status(404).send("FETCH_ERROR");  // Not found
 });
 
 
@@ -98,13 +98,15 @@ router.get("/user/email/:email", async (req, res) => {
   let projection = {_id: 1};
   let result = await collection.findOne(query, projection);
 
-  if (result) res.send(result).status(200);
-  else res.send("FETCH_ERROR").status(404);  // Not found
+  if (result) res.status(200).send(result);
+  else res.status(404).send("FETCH_ERROR");  // Not found
 });
 
 
 // Allows creation of a new user
 router.post("/user/create", async (req, res) => {
+
+  console.log(req.body);
 
   let newUser = {
     username: req.body.username,
@@ -115,15 +117,15 @@ router.post("/user/create", async (req, res) => {
   };
 
   if(Object.values(newUser).includes(undefined)){
-    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    res.status(400).send("KEY_ERROR");  // Keys not provided proper values
     return;
   }
 
   let collection = await db.collection("users");
   let result = await collection.insertOne(newUser);
 
-  if(result) res.send(result.insertedId).status(201);
-  else res.send("CREATE_ERROR").status(500);  // Insertion failed
+  if(result) res.status(201).send(result.insertedId);
+  else res.status(500).send("CREATE_ERROR");  // Insertion failed
 });
 
 
@@ -137,8 +139,8 @@ router.patch("/user/insert/friend/:id", async (req, res) => {
   let arrayAction = {$push: {friends: friendID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("INSERT_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -152,8 +154,8 @@ router.patch("/user/insert/group/:id", async (req, res) => {
   let arrayAction = {$push: {groups: groupID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("INSERT_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -167,8 +169,8 @@ router.patch("/user/pop/friend/:id", async (req, res) => {
   let arrayAction = {$pull: {friends: friendID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("POP_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -182,8 +184,8 @@ router.patch("/user/pop/group/:id", async (req, res) => {
   let arrayAction = {$pull: {groups: groupID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("POP_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -193,8 +195,8 @@ router.delete("/user/delete/:id", async (req, res) => {
   let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
-  if(result) res.send("SUCCESS").status(200)
-  else res.send("DELETE_ERROR").status(500); // Deletion failed
+  if(result) res.status(200).send("SUCCESS");
+  else res.status(500).send("DELETE_ERROR"); // Deletion failed
 });
 
 
@@ -207,7 +209,7 @@ router.get('/group', async (req, res) => {
   let results = await collection.find({}).toArray();
 
   console.log(results);
-  res.send(results).status(200);
+  res.status(200).send(results);
 });
 
 
@@ -218,8 +220,8 @@ router.get("/group/:id", async (req, res) => {
   let projection = {_id: 1};
   let result = await collection.findOne(query, projection);
 
-  if (result) res.send(result).status(200);
-  else res.send("FETCH_ERROR").status(404);  // Not found
+  if (result) res.status(200).send(result);
+  else res.status(404).send("FETCH_ERROR");  // Not found
 });
 
 
@@ -233,15 +235,15 @@ router.post("/group/create", async (req, res) => {
   };
 
   if(Object.values(newGroup).includes(undefined)){
-    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    res.status(400).send("KEY_ERROR");  // Keys not provided proper values
     return;
   }
 
   let collection = await db.collection("groups");
   let result = await collection.insertOne(newGroup);
 
-  if(result) res.send(result.insertedId).status(201);
-  else res.send("CREATE_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send(result.insertedId);
+  else res.status(500).send("CREATE_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -255,8 +257,8 @@ router.patch("/group/insert/user/:id", async (req, res) => {
   let arrayAction = {$push: {members: userID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("INSERT_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("INSERT_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -270,8 +272,8 @@ router.patch("/group/insert/transaction/:id", async (req, res) => {
   let arrayAction = {$push: {transactions: transactionID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("INSERT_ERROR").status(500);  // Removal failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("INSERT_ERROR");  // Removal failed for other reason
 });
 
 
@@ -285,8 +287,8 @@ router.patch("/group/pop/user/:id", async (req, res) => {
   let arrayAction = {$pull: {members: userID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result.acknowledged) res.send("SUCCESS").status(201);
-  else res.send("POP_ERROR").status(500);  // Removal failed for other reason
+  if(result.acknowledged) res.status(201).send("SUCCESS");
+  else res.status(500).send("POP_ERROR");  // Removal failed for other reason
 });
 
 
@@ -300,8 +302,8 @@ router.patch("/group/pop/transaction/:id", async (req, res) => {
   let arrayAction = {$pull: {transactions: transactionID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.send("SUCCESS").status(201);
-  else res.send("POP_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("POP_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -311,8 +313,8 @@ router.delete("/group/delete/:id", async (req, res) => {
   let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
-  if(result) res.send("SUCCESS").status(200)
-  else res.send("DELETE_ERROR").status(500); // Deletion failed
+  if(result) res.status(200).send("SUCCESS");
+  else res.status(500).send("DELETE_ERROR"); // Deletion failed
 });
 
 
@@ -325,7 +327,7 @@ router.get('/transaction', async (req, res) => {
   let results = await collection.find({}).toArray();
 
   console.log(results);
-  res.send(results).status(200);
+  res.status(200).send(results);
 });
 
 
@@ -336,8 +338,8 @@ router.get("/transaction/:id", async (req, res) => {
   let projection = {_id: 1};
   let result = await collection.findOne(query, projection);
 
-  if (!result) res.send("FETCH_ERROR").status(404);  // Not found
-  else res.send(result).status(200);
+  if (result) res.status(200).send(result);
+  else res.status(404).send("FETCH_ERROR");  // Not found
 });
 
 
@@ -352,15 +354,15 @@ router.post("/transaction/create", async (req, res) => {
   };
 
   if(Object.values(newTransaction).includes(undefined)){
-    res.send("KEY_ERROR").status(400);  // Keys not provided proper values
+    res.status(400).send("KEY_ERROR");  // Keys not provided proper values
     return;
   }
 
   let collection = await db.collection("transactions");
   let result = await collection.insertOne(newTransaction);
 
-  if(result) res.send(result.insertedId).status(204);
-  else res.send("CREATE_ERROR").status(500);  // Insertion failed for other reason
+  if(result) res.status(201).send(result.insertedId);
+  else res.status(500).send("CREATE_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -374,8 +376,8 @@ router.patch("/transaction/update/:id", async (req, res) => {
   let updateAction = {$set: {amount: updatedAmount}};
   let result = await updateOne(query, updateAction)
   
-  if(result) res.send("SUCCESS").status(204);
-  else res.send("UPDATE_ERROR").status(500);  // Update failed for other reason
+  if(result) res.status(200).send("SUCCESS");
+  else res.status(500).send("UPDATE_ERROR");  // Update failed for other reason
 });
 
 
@@ -385,8 +387,8 @@ router.delete("/transaction/delete/:id", async (req, res) => {
   let query = {_id: new ObjectId(req.params.id)};
   let result = await collection.deleteOne(query);
 
-  if(result) res.send("SUCCESS").status(200)
-  else res.send("DELETE_ERROR").status(500); // Deletion failed
+  if(result) res.status(200).send("SUCCESS");
+  else res.status(500).send("DELETE_ERROR"); // Deletion failed
 });
 
 export default router;
