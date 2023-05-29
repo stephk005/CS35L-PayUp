@@ -17,7 +17,6 @@ export default function Login() {
   const handleSubmit = async (event) => {
     //Prevent page reload
     event.preventDefault();
-
     var { uname, pass } = document.forms[0];
 
     // Find user login info

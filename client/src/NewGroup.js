@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./NewGroup.css";
-import Header from "./Header";
+import HomeHeader from "./HomeHeader";
 
 const DropdownMenu = ({ selectedFriends, handleFriendSelection }) => {
   const [amounts, setAmounts] = useState({});
@@ -84,7 +84,7 @@ export default function NewGroup() {
 
   return (
     <div>
-      <Header/>
+      <HomeHeader/>
       <div className="newgroup">
         <div className="newgroup-form">
           {isSubmitted ? <div>Group successfully created</div> : renderForm}
