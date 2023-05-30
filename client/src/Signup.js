@@ -21,55 +21,97 @@ export default function Signup() {
     var { email, uname, pass} = document.forms[0];
 
     // Make get request to find user with specific username
+    // console.log("email: ", email.value, " | uname: ", uname.value, " | pass: ", pass.value)
     const usernameResp = await fetch(`http://localhost:5050/record/user/username/${uname.value}`);
     const emailResp = await fetch(`http://localhost:5050/record/user/email/${email.value}`);
 
-    if (!usernameResp.ok){
+    // console.log('userrep, ', usernameResp);
+    // console.log('emailrep, ', emailResp);
+
+    if (!usernameResp.ok && usernameResp.statusText !== "Not Found"){
       const message = `An error has occured: ${usernameResp.statusText}`;
       window.alert(message);
       return;
     }
 
-    if(!emailResp.ok){
+    if(!emailResp.ok && emailResp.statusText !== "Not Found"){
       const message = `An error has occurred: ${emailResp.statusText}`;
       window.alert(message);
       return;
     }
 
     // Compare user info
-    if (await emailResp.text() !== "Not found") {
+    console.log("emailresptext: ", emailResp.statusText);
+    if (await emailResp.statusText !== "Not Found") {
       // Email already in use
-      console.log("fojefifis")
+      // console.log("email in use");
       setErrorMessages({ name: "err_email", message: signup_errors.email });
     } 
-    else if (await usernameResp.text() !== "Not found"){
+    else if (await usernameResp.statusText !== "Not Found"){
       // Username already in use
+      // console.log("username in use");
       setErrorMessages({ name: "err_name", message: signup_errors.uname });
     }else {
       setIsValidSignUp(true);
 
       // Need to make POST request to database
 
+      const url = 'http://localhost:5050/record/user/create';
+
       // User Structure
       const newUser = {
         username: uname.value,
         password: pass.value,
-        email: email.value
+        email: email.value,
+        groups: [],
+        friends: []
       };
-
+      
       // POST request
-      await fetch("http://localhost:5050/record", {
+      // await fetch(url, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(newUser),
+      // })
+      // .catch(error => {
+      //   window.alert(error);
+      //   return;
+      // });
+
+      let result = await fetch(url, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+            'Content-Type': 'application/json'   // This needs to be included for proper parsing
         },
-        body: JSON.stringify(newUser),
-      })
-      .catch(error => {
-        window.alert(error);
-        return;
-      });
+        body: JSON.stringify(newUser)
+    });
+    
+    console.log(result.statusText);
+    
+    if (result.status !== 201) console.log(await result.text());  // Logs errors
+    else {
+        let user = await result.json();  // Converts to proper JS Object
+        console.log("user", user);
+        let userData;
+        try{
+          const useridResp = await fetch(`http://localhost:5050/record/user/${user}`);
+          userData = await useridResp.json();
+          // console.log("userdata(resp),", userData);
+        } catch (e) {
+          console.error(e);
+        }
+        localStorage.setItem("currentuser", JSON.stringify(userData));
+        // let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+        // console.log("user(signup) ", currentUser);
     }
+
+      
+
+    
+    }
+    
   };
 
   // Generate JSX code for error message

@@ -21,7 +21,7 @@ export default function Login() {
     // Find user login info
     const usernameResp = await fetch(`http://localhost:5050/record/user/username/${uname.value}`);
 
-    if (!usernameResp.ok){
+    if (usernameResp.statusText !== "Not Found" && !usernameResp.ok){
       const message = `An error has occured: ${usernameResp.statusText}`;
       window.alert(message);
       return;
@@ -43,7 +43,7 @@ export default function Login() {
       } else {
         setIsSubmitted(true);
         localStorage.setItem("currentuser", JSON.stringify(userData));
-        let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+        // let currentUser = JSON.parse(localStorage.getItem("currentuser"));
         // console.log("user(login) ", currentUser);
 
       }
