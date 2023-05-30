@@ -154,7 +154,6 @@ export default function Group() {
           <button className="new-group-button">New Group</button>
         </a>
       </div>
-        {renderEntryForm}
     </div>
   </div>
   );

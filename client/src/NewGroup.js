@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./NewGroup.css";
 import HomeHeader from "./HomeHeader";
-import CurrencyInput from 'react-currency-input-field'; 
+import CurrencyInput from 'react-currency-input-field';
 
 const DropdownMenu = ({ selectedFriends, handleFriendSelection }) => {
   const [amounts, setAmounts] = useState({});
@@ -108,6 +108,8 @@ export default function NewGroup() {
     // console.log("name: ", transname.value);
     // console.log("amount: ", amount.value);
     // console.log("friend: ", friend);
+    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+    // console.log("newgroup ", currentUser);
   }
 
 

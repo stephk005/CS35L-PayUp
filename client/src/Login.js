@@ -3,7 +3,6 @@ import "./Login.css";
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
 
-
 export default function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -31,6 +30,7 @@ export default function Login() {
     let userData;
     try{
       userData = await usernameResp.json();
+      // console.log(userData);
     } catch (e) {
       console.error(e);
     }
@@ -42,6 +42,10 @@ export default function Login() {
         setErrorMessages({ name: "err_pass", message: login_errors.pass });
       } else {
         setIsSubmitted(true);
+        localStorage.setItem("currentuser", JSON.stringify(userData));
+        let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+        // console.log("user(login) ", currentUser);
+
       }
     } else {
       // Username not found
