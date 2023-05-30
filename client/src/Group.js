@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Group.css";
 import HomeHeader from "./HomeHeader";
-import CurrencyInput from 'react-currency-input-field'; 
+import CurrencyInput from 'react-currency-input-field';
 
 
 export default function Group() {
@@ -9,7 +9,7 @@ export default function Group() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [friend, setFriend] = useState("friend1");
 
-  //temp list of friends 
+  //temp list of friends
   const friends = [
     {
       label: "Friend 1",
@@ -29,7 +29,6 @@ export default function Group() {
     },
   ];
 
-  const groupname = "San Diego Trip";
   const temp_database = [
     {
       "Dinner": {
@@ -87,7 +86,7 @@ export default function Group() {
 
   // const handleChange = (event) => {
   //   setState({selectValue: event.target.value}, ()=> {alert(`Value: ${state.selectValue}`)});
-  //   } 
+  //   }
 
   const renderDropdown = (
     <div>
@@ -106,7 +105,7 @@ export default function Group() {
   );
 
   const handleSubmit = async (event) => {
-    
+
     //Prevent page reload
     event.preventDefault();
     var { transname,amount} = document.forms[0];
@@ -131,7 +130,7 @@ export default function Group() {
             <div className="dropdown">{renderDropdown}</div>
             <div className="input-container">
               <label>Amount Requested ($): </label>
-              <CurrencyInput name="amount" allowNegativeValue={false} 
+              <CurrencyInput name="amount" allowNegativeValue={false}
               disableAbbreviations={true} disableGroupSeparators={true} />
             </div>
             <div className="button-container">
@@ -142,13 +141,12 @@ export default function Group() {
     </div>
   );
 
-  
+
   return (
   <div>
     <HomeHeader/>
     <div className="groupscreen">
       <div className="group">
-        <div className="title">{groupname}</div>
         {renderTransactions}
         <a href="http://localhost:3000/Group/New">
           <button className="new-group-button">New Group</button>

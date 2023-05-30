@@ -9,34 +9,75 @@
   background-color: #fff;
 }
 
-.dropdown-container {
-  justify-content: flex-end;
-  margin-top: 10px;
-  margin-right: 10px;
+.checkbox-dropdown {
+  width: 200px;
+  border: 1px solid #aaa;
+  padding: 10px;
+  position: relative;
+  margin: 0 auto;
+  user-select: none;
 }
 
-.dropdown-menu {
-  border: 1px solid #ccc;
-  padding: 16px;
-  background-color: #f9f9f9;
-  top: 100px;
-  right: 0;
+/* Display CSS arrow to the right of the dropdown text */
+.checkbox-dropdown:after {
+  content: "";
+  height: 0;
+  position: absolute;
+  width: 0;
+  border: 6px solid transparent;
+  border-top-color: #000;
+  top: 50%;
+  right: 10px;
+  margin-top: -3px;
 }
 
-.dropdown-menu label {
+/* Reverse the CSS arrow when the dropdown is active */
+.checkbox-dropdown.is-active:after {
+  border-bottom-color: #000;
+  border-top-color: #fff;
+  margin-top: -9px;
+}
+
+.checkbox-dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 100%; /* align the dropdown right below the dropdown text */
+  border: inherit;
+  border-top: none;
+  left: -1px; /* align the dropdown to the left */
+  right: -1px; /* align the dropdown to the right */
+  opacity: 0; /* hide the dropdown */
+  transition: opacity 0.4s ease-in-out;
+  max-height: 100px; /* Updated max-height value */
+  overflow: auto;
+  background-color: #fff; /* Set the background color to white */
+  pointer-events: none; /* avoid mouse click events inside the dropdown */
+}
+
+.is-active .checkbox-dropdown-list {
+  opacity: 1; /* display the dropdown */
+  pointer-events: auto; /* make sure that the user still can select checkboxes */
+}
+
+.checkbox-dropdown-list li label {
   display: block;
-  margin-bottom: 8px;
-}
-
-.dropdown-menu input[type="checkbox"] {
-  margin-right: 8px;
+  border-bottom: 1px solid silver;
+  padding: 10px;
+  transition: all 0.2s ease-out;
 }
 
 .selected-friends {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
+  position: absolute;
+  top: calc(100% + 100px); /* Display directly below the dropdown menu */
+  left: 0;
+  background-color: #fff;
+  padding: 10px;
+}
+
+.selected-friends > div {
+  margin-bottom: 5px;
 }
 
 input[type="text"],
@@ -62,13 +103,16 @@ input[type="submit"]:hover {
 .button-container {
   display: flex;
   justify-content: center;
+  margin-top: 20px; /* Add margin-top to create space between the form and the button */
 }
 
 .newgroup-form {
-  background-color: rgb(255, 255, 255);
-  padding-top: 1rem;
-  /* width: 0vh; */
-  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+  margin-top: 10vh;
+  background-color: rgb(231, 221, 254);
+  padding: 2rem;
+  width: 70vh;
+  height: 80vh;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .list-container {
@@ -93,7 +137,6 @@ input[type="submit"]:hover {
 }
 
 .entry {
-  
   font-family: sans-serif;
   display: flex;
   align-items: center;
@@ -101,15 +144,8 @@ input[type="submit"]:hover {
   /* gap: 20px; */
   height: 50vh;
   /* width: 20vw; */
-  
+
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   background-color: rgb(231, 221, 254);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
-}
-
-.entrylabel {
-  display: flex;
-  font-size: 20px;
-  padding-top: 2rem;
 }
