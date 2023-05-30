@@ -65,11 +65,10 @@ input[type="submit"]:hover {
 }
 
 .newgroup-form {
-  margin-top: 10vh;
   background-color: rgb(255, 255, 255);
-  padding: 2rem;
+  padding-top: 1rem;
   width: 70vh;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
 }
 
 .list-container {
@@ -91,4 +90,26 @@ input[type="submit"]:hover {
   flex-direction: column;
   gap: 8px;
   margin: 10px;
+}
+
+.entry {
+  
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  /* gap: 20px; */
+  height: 50vh;
+  /* width: 20vw; */
+  
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  background-color: rgb(231, 221, 254);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+}
+
+.entrylabel {
+  display: flex;
+  font-size: 20px;
+  padding-top: 2rem;
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./NewGroup.css";
 import HomeHeader from "./HomeHeader";
+import CurrencyInput from 'react-currency-input-field'; 
 
 const DropdownMenu = ({ selectedFriends, handleFriendSelection }) => {
   const [amounts, setAmounts] = useState({});
@@ -50,6 +51,27 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection }) => {
 export default function NewGroup() {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [friend, setFriend] = useState("friend1");
+
+  //temp list of friends 
+  const friends = [
+    {
+      label: "Friend 1",
+      value: "friend1",
+    },
+    {
+      label: "Friend 2",
+      value: "friend2",
+    },
+    {
+      label: "Friend 3",
+      value: "friend3",
+    },
+    {
+      label: "Friend 4",
+      value: "friend4",
+    },
+  ];
 
   const handleFriendSelection = (event) => {
     const friendName = event.target.value;
@@ -59,6 +81,59 @@ export default function NewGroup() {
       setSelectedFriends(selectedFriends.filter((friend) => friend !== friendName));
     }
   };
+
+  const renderDropdown = (
+    <div>
+      <label>Select Friend: </label>
+      <select value={friend} onChange={e=>setFriend(e.target.value)}>
+      {/*   <option value="friend1" >Friend 1</option>
+        <option value="friend2">Friend 2</option>
+        <option value="friend3">Friend 3</option>
+        <option value="friend4">Friend 4</option> */}
+        {friends.map((option) => (
+              <option value={option.value}>{option.label}</option>
+            ))}
+      </select>
+
+    </div>
+  );
+
+  const handleSubmit = async (event) => {
+    
+    //Prevent page reload
+    event.preventDefault();
+    var { transname,amount} = document.forms[0];
+    // var { transname, friend, amount} = document.forms[0];
+    // console.log(document.forms[0]);
+    // console.log("name: ", transname.value);
+    // console.log("amount: ", amount.value);
+    // console.log("friend: ", friend);
+  }
+
+
+// Creating new transaction entry
+  const renderEntryForm = (
+    <div className="form">
+      <form onSubmit={handleSubmit}>
+        <div className="entry">
+            <label className="entrylabel">Create entry</label>
+            <div className="input-container">
+              <label>Enter Transaction Name: </label>
+              <input type="text" name="transname" required />
+            </div>
+            <div className="dropdown">{renderDropdown}</div>
+            <div className="input-container">
+              <label>Amount Requested ($): </label>
+              <CurrencyInput name="amount" allowNegativeValue={false} 
+              disableAbbreviations={true} disableGroupSeparators={true} />
+            </div>
+            <div className="button-container">
+             <input type="submit" />
+           </div>
+        </div>
+      </form>
+    </div>
+  );
 
   const renderForm = (
     <div className="newgroup">
@@ -87,7 +162,7 @@ export default function NewGroup() {
       <HomeHeader/>
       <div className="newgroup">
         <div className="newgroup-form">
-          {isSubmitted ? <div>Group successfully created</div> : renderForm}
+          {isSubmitted ? <div>Group successfully created</div> : renderEntryForm}
         </div>
       </div>
     </div>
