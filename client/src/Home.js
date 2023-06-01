@@ -6,22 +6,38 @@ import { Link } from "react-router-dom";
 
 
 export default function Home(){
+    const [addError, setaddError] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const renderFriendErrorMessage = () =>
+        (
+            <div className="error">{"Cannot find friend"}</div>
+        );
+    const renderFriendSuccessMessage = () =>
+    (
+        <div className="success">{"Friend added"}</div>
+    );
+
     const handleSubmit = async (event) => {
-    
         //Prevent page reload
         event.preventDefault();
+        setIsSubmitted(true);
 
         var {friendname} = document.forms[0];
         // console.log("friendname: ", friendname.value);
-
-
+        // Generate JSX code for error message
+        
         const usernameResp = await fetch(`http://localhost:5050/record/user/username/${friendname.value}`);
 
-        if (usernameResp.statusText !== "Not Found" && !usernameResp.ok){ //if friend isnt found
-            const message = `An error has occured: ${usernameResp.statusText}`;
-            window.alert(message);
+        if (!usernameResp.ok){ //if friend isnt found
+            
+            // const message = `An error has occured: ${usernameResp.statusText}`;
+            // window.alert(message);
+            setaddError(true);
+            // console.log("error finding friend");
             return;
         }
+        setaddError(false);
         //if friend username is found 
         let friendData;
         try{
@@ -43,6 +59,7 @@ export default function Home(){
             if (friendID._id == currentUser._id)
             {
                 window.alert("Cannot add yourself. ");
+                setaddError(true);
                 return;
             }
             const url = `http://localhost:5050/record/user/insert/friend/${currentUser._id}`;
@@ -90,6 +107,7 @@ export default function Home(){
                                     <input type="text" name = "friendname" placeholder="Search for friend" />
                                     <input type="submit" value="Add"/>
                                 </div>
+                                {isSubmitted ? (addError ? renderFriendErrorMessage(): renderFriendSuccessMessage()) : <></>}
                             </form>
                             <ul className="friendsList">{loadFriendsList()}</ul> 
                         </div>

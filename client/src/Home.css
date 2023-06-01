@@ -149,5 +149,19 @@ input[type="submit"] {
     padding: 5px 10px;
   }
 
+  .error {
+    color: red;
+    font-size: 12px;
+    padding-left: 1rem;
+  }
+
+  .success {
+    color:#01d28e;
+    font-size: 12px;
+    padding-left: 1rem;
+  }
+
+
+
 
 
