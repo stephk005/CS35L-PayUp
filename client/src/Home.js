@@ -32,6 +32,7 @@ export default function Home(){
         console.error(e);
         }
 
+        
         if (friendData)
         {
             let friendID = {id: friendData._id};
@@ -56,7 +57,7 @@ export default function Home(){
             if(result.status !== 201) console.log("Error inserting friend ID");
             else {  // Print updated user document
                 console.log("Successfully inserted friend!");
-                let userURL = 'http://localhost:5050/record/user/${currentUser._id}'
+                const userURL = `http://localhost:5050/record/user/${currentUser._id}`;
                 let res = await fetch(userURL);
                 if(res.status === 200){
                     let user = await res.json();
