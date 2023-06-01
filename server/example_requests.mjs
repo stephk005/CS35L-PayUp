@@ -39,7 +39,8 @@ let newUser = {
     password: "manualPassword",
     email: "manualEmail@email.com",
     groups: [],  // list of _id (groups)
-    friends: []  // list of _id (users)
+    friends: [],  // list of _id (users)
+    transactions: []  // list of _id (transactions)
   };
 
 

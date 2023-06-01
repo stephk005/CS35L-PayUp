@@ -18,8 +18,10 @@ const router = express.Router();
     Create new user: /user/create
     Insert new friend: /user/insert/friend/:user_id
     Insert new group: /user/insert/group/:user_id
+    Insert new transaction: /user/insert/transaction/:user_id
     Pop friend: /user/pop/friend/:user_id
     Pop group: /user/pop/group/:user_id
+    Pop transaction: /user/pop/transaction/:user_id
     Delete user: /user/delete/:user_id
 
   GROUP:
@@ -113,7 +115,8 @@ router.post("/user/create", async (req, res) => {
     password: req.body.password,
     email: req.body.email,
     groups: req.body.groups,  // list of _id (groups)
-    friends: req.body.friends  // list of _id (users)
+    friends: req.body.friends,  // list of _id (users)
+    transactions: req.body.transactions  // list of _id (transactions)
   };
 
   if(Object.values(newUser).includes(undefined)){
@@ -159,6 +162,21 @@ router.patch("/user/insert/group/:id", async (req, res) => {
 });
 
 
+// Allows addition of new transaction (should pass user ID)
+router.patch("/user/insert/transaction/:id", async (req, res) => {
+
+  let transactionID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$push: {transactions: transactionID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("INSERT_ERROR");  // Insertion failed for other reason
+});
+
+
 // Allows removal of friend (should pass user ID)
 router.patch("/user/pop/friend/:id", async (req, res) => {
 
@@ -182,6 +200,21 @@ router.patch("/user/pop/group/:id", async (req, res) => {
   let collection = await db.collection("users");
   let query = {_id: new ObjectId(req.params.id)};
   let arrayAction = {$pull: {groups: groupID}};
+  let result = await collection.updateOne(query, arrayAction);
+
+  if(result) res.status(201).send("SUCCESS");
+  else res.status(500).send("POP_ERROR");  // Insertion failed for other reason
+});
+
+
+// Allows removal of group (should pass user ID)
+router.patch("/user/pop/transaction/:id", async (req, res) => {
+
+  let transactionID = req.body.id;
+
+  let collection = await db.collection("users");
+  let query = {_id: new ObjectId(req.params.id)};
+  let arrayAction = {$pull: {transactions: transactionID}};
   let result = await collection.updateOne(query, arrayAction);
 
   if(result) res.status(201).send("SUCCESS");
@@ -374,7 +407,7 @@ router.patch("/transaction/update/:id", async (req, res) => {
   let collection = await db.collection("transactions");
   let query = {_id: new ObjectId(req.params.id)};
   let updateAction = {$set: {amount: updatedAmount}};
-  let result = await updateOne(query, updateAction)
+  let result = await collection.updateOne(query, updateAction)
   
   if(result) res.status(200).send("SUCCESS");
   else res.status(500).send("UPDATE_ERROR");  // Update failed for other reason
