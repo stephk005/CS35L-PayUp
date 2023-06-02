@@ -4,11 +4,15 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
-  
+
 export default function Profile() {
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const navigate = useNavigate();
+
+    let currentUser = JSON.parse(localStorage.getItem('currentuser'));
+    let email = currentUser.email;
+    let username = currentUser.username;
 
     const handleSubmit = async (event) => {
         //Prevent page reload
@@ -26,16 +30,18 @@ export default function Profile() {
             setIsSubmitted(true);
             // console.log("aft length: ", localStorage.length);
         }
-        
+
       };
 
     const renderForm = (
         <div className="form">
           <form onSubmit={handleSubmit}>
                 <div className="signout">
+                  <a href="http://localhost:3000/Welcome">
                     <div className="button-container">
-                        <input type="submit" value="Sign out" />
+                      <input type="submit" value="Sign out" />
                     </div>
+                  </a>
                 </div>
           </form>
         </div>
@@ -46,12 +52,19 @@ export default function Profile() {
             <HomeHeader/>
             <div className="profile">
                 <div className="profileinfo">
-                    <p>Profile stuff here. </p>
+                  <p>
+                    <span className="label">Username:</span>
+                    <span className="item">{username}</span>
+                  </p>
+                  <p>
+                    <span className="label">Email:</span>
+                    <span className="item">{email}</span>
+                  </p>
                 </div>
-                
+
                 {isSubmitted ? navigate("/") : renderForm}
                 {/* <Link className = "signout_link" to="/">Sign out</Link> */}
-                
+
             </div>
       </div>
       );

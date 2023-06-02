@@ -4,12 +4,28 @@
     flex-direction: column;
     height: 100vh;
     background-color: #a597ec;
+    align-items: center;
   }
 
   .profileinfo {
+    margin-top: 10vh;
+    background-color: rgb(255, 255, 255);
+    padding: 2rem;
+    width: 70vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .profileinfo p {
     display: flex;
     align-items: center;
-    justify-content: center;
+  }
+
+  .label {
+    margin-right: 1rem;
+  }
+
+  .item {
+    margin-left: 1rem;
   }
 
   .signout{

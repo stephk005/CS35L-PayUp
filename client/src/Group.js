@@ -83,65 +83,7 @@ export default function Group() {
       })}
     </div>
   );
-
-  // const handleChange = (event) => {
-  //   setState({selectValue: event.target.value}, ()=> {alert(`Value: ${state.selectValue}`)});
-  //   }
-
-  const renderDropdown = (
-    <div>
-      <label>Select Friend: </label>
-      <select value={friend} onChange={e=>setFriend(e.target.value)}>
-      {/*   <option value="friend1" >Friend 1</option>
-        <option value="friend2">Friend 2</option>
-        <option value="friend3">Friend 3</option>
-        <option value="friend4">Friend 4</option> */}
-        {friends.map((option) => (
-              <option value={option.value}>{option.label}</option>
-            ))}
-      </select>
-
-    </div>
-  );
-
-  const handleSubmit = async (event) => {
-
-    //Prevent page reload
-    event.preventDefault();
-    var { transname,amount} = document.forms[0];
-    // var { transname, friend, amount} = document.forms[0];
-    // console.log(document.forms[0]);
-    // console.log("name: ", transname.value);
-    // console.log("amount: ", amount.value);
-    // console.log("friend: ", friend);
-  }
-
-
-// Creating new transaction entry
-  const renderEntryForm = (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div className="entry">
-            <label className="entrylabel">Create entry</label>
-            <div className="input-container">
-              <label>Enter Transaction Name: </label>
-              <input type="text" name="transname" required />
-            </div>
-            <div className="dropdown">{renderDropdown}</div>
-            <div className="input-container">
-              <label>Amount Requested ($): </label>
-              <CurrencyInput name="amount" allowNegativeValue={false}
-              disableAbbreviations={true} disableGroupSeparators={true} />
-            </div>
-            <div className="button-container">
-             <input type="submit" />
-           </div>
-        </div>
-      </form>
-    </div>
-  );
-
-
+  
   return (
   <div>
     <HomeHeader/>

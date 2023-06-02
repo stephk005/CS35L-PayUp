@@ -4,6 +4,19 @@ import "./Signup.css"
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
 
+// TODO : validate emails
+/*
+function ValidateEmail(mail)
+{
+ if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(myForm.emailAddr.value))
+  {
+    return (true)
+  }
+    alert("You have entered an invalid email address!")
+    return (false)
+}
+*/
+
 export default function Signup() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isValidSignUp, setIsValidSignUp] = useState(false);
@@ -15,7 +28,7 @@ export default function Signup() {
   };
 
   const handleSubmit = async (event) => {
-    
+
     //Prevent page reload
     event.preventDefault();
     var { email, uname, pass} = document.forms[0];
@@ -46,7 +59,7 @@ export default function Signup() {
       // Email already in use
       // console.log("email in use");
       setErrorMessages({ name: "err_email", message: signup_errors.email });
-    } 
+    }
     else if (await usernameResp.statusText !== "Not Found"){
       // Username already in use
       // console.log("username in use");
@@ -66,7 +79,7 @@ export default function Signup() {
         groups: [],
         friends: []
       };
-      
+
       // POST request
       // await fetch(url, {
       //   method: "POST",
@@ -87,9 +100,9 @@ export default function Signup() {
         },
         body: JSON.stringify(newUser)
     });
-    
+
     console.log(result.statusText);
-    
+
     if (result.status !== 201) console.log(await result.text());  // Logs errors
     else {
         let user = await result.json();  // Converts to proper JS Object
@@ -107,11 +120,11 @@ export default function Signup() {
         // console.log("user(signup) ", currentUser);
     }
 
-      
 
-    
+
+
     }
-    
+
   };
 
   // Generate JSX code for error message
