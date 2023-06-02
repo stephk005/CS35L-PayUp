@@ -110,10 +110,6 @@ export default function Home(){
                                 {isSubmitted ? (addError ? renderFriendErrorMessage(): renderFriendSuccessMessage()) : <></>}
                             </form>
                             <ul className="friendsList">{loadFriendsList()}</ul> 
-                        </div>
-                    <label>Groups</label>
-                    <div className="FriendsListContent">
-                            <ul className="friendsList">{loadGroupsList()}</ul> 
                     </div>
                 </div>
             </div> 
@@ -147,20 +143,6 @@ function loadToPayList(){
             </label>
             <label className="Amount">
                 Amount: {array}
-            </label>
-            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
-        
-        </button>
-    })
-
-}
-
-function loadGroupsList(){
-    let array = [1,2,3,4,5,6,7,8,9,0]
-    return array.map((array)=>{
-        return <button className="FriendLi">
-            <label className="Friend">
-                {"Friend: "+array}
             </label>
             <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
         
