@@ -1,6 +1,6 @@
 import HomeHeader from "./HomeHeader";
 import  "./Profile.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
@@ -11,8 +11,16 @@ export default function Profile() {
     const navigate = useNavigate();
 
     let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-    let email = currentUser.email;
-    let username = currentUser.username;
+    // console.log("current user (profile): ", currentUser);
+    // let email = currentUser.email;
+    // let username = currentUser.username;
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+      setEmail(currentUser.email);
+      setUsername(currentUser.username);
+    }, []);
 
     const handleSubmit = async (event) => {
         //Prevent page reload
@@ -26,24 +34,41 @@ export default function Profile() {
             window.alert(message);
         }
         else {
+            setEmail("");
+            setUsername("");
             localStorage.clear();
             setIsSubmitted(true);
+            // console.log("clear");
+            
+            // console.log("clear after");
             // console.log("aft length: ", localStorage.length);
         }
 
       };
 
     const renderForm = (
-        <div className="form">
-          <form onSubmit={handleSubmit}>
-                <div className="signout">
-                  <a href="http://localhost:3000/Welcome">
-                    <div className="button-container">
-                      <input type="submit" value="Sign out" />
-                    </div>
-                  </a>
-                </div>
-          </form>
+      <div>
+        <div className="profileinfo">
+                    <p>
+                      <span className="label">Username:</span>
+                      <span className="item">{username}</span>
+                    </p>
+                    <p>
+                      <span className="label">Email:</span>
+                      <span className="item">{email}</span>
+                    </p>
+                  </div>
+          <div className="form">
+            <form onSubmit={handleSubmit}>
+                  <div className="signout">
+                    {/* <a href="http://localhost:3000/Welcome"> */}
+                      <div className="button-container">
+                        <input type="submit" value="Sign out" />
+                      </div>
+                    {/* </a> */}
+                  </div>
+            </form>
+          </div>
         </div>
       );
 
@@ -51,17 +76,6 @@ export default function Profile() {
         <div>
             <HomeHeader/>
             <div className="profile">
-                <div className="profileinfo">
-                  <p>
-                    <span className="label">Username:</span>
-                    <span className="item">{username}</span>
-                  </p>
-                  <p>
-                    <span className="label">Email:</span>
-                    <span className="item">{email}</span>
-                  </p>
-                </div>
-
                 {isSubmitted ? navigate("/") : renderForm}
                 {/* <Link className = "signout_link" to="/">Sign out</Link> */}
 

@@ -64,34 +64,22 @@ export default function Signup() {
       // Username already in use
       // console.log("username in use");
       setErrorMessages({ name: "err_name", message: signup_errors.uname });
-    }else {
+    }
+    else {
+      // console.log("sign up valid");
       setIsValidSignUp(true);
 
       // Need to make POST request to database
-
       const url = 'http://localhost:5050/record/user/create';
-
       // User Structure
       const newUser = {
         username: uname.value,
         password: pass.value,
         email: email.value,
         groups: [],
-        friends: []
+        friends: [],
+        transactions: []
       };
-
-      // POST request
-      // await fetch(url, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(newUser),
-      // })
-      // .catch(error => {
-      //   window.alert(error);
-      //   return;
-      // });
 
       let result = await fetch(url, {
         method: "POST",
@@ -101,7 +89,7 @@ export default function Signup() {
         body: JSON.stringify(newUser)
     });
 
-    console.log(result.statusText);
+    // console.log(result.status);
 
     if (result.status !== 201) console.log(await result.text());  // Logs errors
     else {
@@ -119,10 +107,6 @@ export default function Signup() {
         // let currentUser = JSON.parse(localStorage.getItem("currentuser"));
         // console.log("user(signup) ", currentUser);
     }
-
-
-
-
     }
 
   };
