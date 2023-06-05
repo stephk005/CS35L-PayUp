@@ -6,6 +6,7 @@ import Group from './Group';
 import NewGroup from './NewGroup';
 import Home from './Home'
 import Profile from './Profile';
+import FriendProfile from './FriendProfile'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route exact path="/Group/New" element={<NewGroup/>}/>
         <Route exact path="/Home" element={<Home/>}/>
         <Route exact path="/Profile" element={<Profile/>}/>
+        <Route exact path="/FriendProfile" element={<FriendProfile/>}/>
       </Routes>
     </Router>
   );
