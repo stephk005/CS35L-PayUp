@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import "./Home.css"
-import Header from "./Header";
+import React, { useEffect, useState, useRef } from "react";
+import "./Home.css";
 import HomeHeader from "./HomeHeader";
 import { Link } from "react-router-dom";
 
@@ -8,15 +7,178 @@ import { Link } from "react-router-dom";
 export default function Home(){
     const [addError, setaddError] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [rerender, setRerender] = useState(true);
+    let toBePaidList = useRef([]);
+    let toPayList = useRef([]);
+    let friends = useRef([]);
+    let isFetching = useRef(true);
 
-    const renderFriendErrorMessage = () =>
-        (
-            <div className="error">{"Cannot find friend"}</div>
+
+
+    useEffect(() => {
+
+        let user = JSON.parse(localStorage.getItem('currentuser'));
+        let transactionIDs = user.transactions;
+        let friendIDs = user.friends;
+
+        loadPayLists();
+        loadFriendList();
+
+        if(isFetching.current)
+            setRerender(!rerender);
+
+        isFetching.current = false;
+
+
+        // Load Transaction Lists
+        async function loadPayLists(){
+
+            let tempToBePaidList = [];
+            let tempToPayList = [];
+
+            for(let transactionID of transactionIDs){
+                let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
+
+                let res = await fetch(transactionURL);
+
+                if(res.status !== 200)
+                    throw new Error("Invalid transaction ID in user!");
+                
+                let transaction = await res.json();
+
+                let loanerURL = `http://localhost:5050/record/user/${transaction.loaner}`;
+                let borrowerURL = `http://localhost:5050/record/user/${transaction.borrower}`;
+                let loaner = await fetch(loanerURL);
+                let borrower = await fetch(borrowerURL);
+
+                if(loaner.status !== 200 || borrower.status !== 200)
+                    throw new Error("Invalid user in transaction!");
+                
+                loaner = await loaner.json();
+                borrower = await borrower.json();
+
+                let entry = {
+                    user: null, // This is the user you borrowed/lent money from/to
+                    amount: transaction.amount
+                };
+
+                if(loaner.username === user.username){
+                    entry.user = borrower.username;
+                    tempToBePaidList.push(JSON.parse(JSON.stringify(entry)));
+                } else if(borrower.username === user.username) {
+                    entry.user = loaner.username;
+                    tempToPayList.push(JSON.parse(JSON.stringify(entry)));
+                } else
+                    throw new Error("Transaction doesn't involve current user!");
+                
+            }
+            toPayList.current = tempToPayList;
+            toBePaidList.current = tempToBePaidList;
+        }
+
+
+        // Load Friend List
+        async function loadFriendList() {
+      
+            let friendArray = [];
+      
+            for (const friendID of friendIDs){
+      
+                const url = "http://localhost:5050/record/user/"+ friendID;
+                let result = await fetch(url);
+                if(result.status === 200){ 
+                    const friendData = await result.json();
+                    const tempData = {name: friendData["username"]};
+                    friendArray.push(tempData);
+                }
+                else console.log("Error sending request");
+            }
+            friends.current = friendArray;
+        }
+
+    }, [rerender]);
+
+
+    
+
+    // Create the elements based off the updated object lists
+    let toPayElement;
+    let toBePaidElement;
+    let friendsElement;
+
+    if(isFetching.current)
+        toPayElement = null;
+    else if(toPayList.current.length === 0)
+        toPayElement = (
+            <h3>Nothing to see here!</h3>
         );
+    else
+        toPayElement = toPayList.current.map((transaction) => {
+            return (
+            <button className="PayLi">
+                <label className="Friend_Name">
+                    {transaction.user}
+                </label>
+                <label className="Amount">
+                    Amount: ${transaction.amount}
+                </label>
+                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+            </button>);
+        });
+
+    
+    if(isFetching.current)
+        toBePaidElement = null;
+    else if(toBePaidList.current.length === 0)
+        toBePaidElement = (
+            <h3>Nothing to see here!</h3>
+        );
+    else
+        toBePaidElement = toBePaidList.current.map((transaction) => {
+            return (
+            <button className="PayLi">
+                <label className="Friend_Name">
+                    {transaction.user}
+                </label>
+                <label className="Amount">
+                    Amount: ${transaction.amount}
+                </label>
+                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+            </button>);
+        });
+    
+    
+    if(isFetching.current)
+        friendsElement = null;
+    else if(friends.current.length === 0)
+        friendsElement = (
+            <h3>Nothing to see here!</h3>
+        );
+    else
+        friendsElement = friends.current.map((friend) => {
+            return (
+            <button className="FriendLi">
+                <label className="Friend">
+                    {friend.name}
+                </label>
+                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+            </button>);
+        });
+    
+    
+
+    // Accepting new friend stuff
+    const renderFriendErrorMessage = () =>
+    (
+        <div className="error">{"Cannot find friend"}</div>
+    );
+
     const renderFriendSuccessMessage = () =>
     (
         <div className="success">{"Friend added"}</div>
     );
+
+
 
     const handleSubmit = async (event) => {
         //Prevent page reload
@@ -26,10 +188,10 @@ export default function Home(){
         var {friendname} = document.forms[0];
         // console.log("friendname: ", friendname.value);
         // Generate JSX code for error message
-        
+    
         const usernameResp = await fetch(`http://localhost:5050/record/user/username/${friendname.value}`);
 
-        if (!usernameResp.ok){ //if friend isnt found
+        if (usernameResp.status !== 200){ //if friend isnt found
             
             // const message = `An error has occured: ${usernameResp.statusText}`;
             // window.alert(message);
@@ -37,31 +199,31 @@ export default function Home(){
             // console.log("error finding friend");
             return;
         }
+
         setaddError(false);
         //if friend username is found 
         let friendData;
         try{
             friendData = await usernameResp.json();
-            // console.log(friendData);
-
         } catch (e) {
-        console.error(e);
+            console.error(e);
         }
 
         
-        if (friendData)
-        {
+        if (friendData) {
             let friendID = {id: friendData._id};
-            // console.log("friend id: ", friendID.id);            
             let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-            // (`http://localhost:5050/record/user/${user}`)
-            // console.log("current user", currentUser._id);
-            if (friendID._id == currentUser._id)
-            {
-                window.alert("Cannot add yourself. ");
+
+            if (friendID.id === currentUser._id) {
+                window.alert("Cannot add yourself.");
+                setaddError(true);
+                return;
+            } else if(currentUser.friends.includes(friendID.id)){
+                window.alert("You already added this friend.");
                 setaddError(true);
                 return;
             }
+
             const url = `http://localhost:5050/record/user/insert/friend/${currentUser._id}`;
             let result = await fetch(url, {
                 method: "PATCH",
@@ -70,6 +232,7 @@ export default function Home(){
                 },
                 body: JSON.stringify(friendID)
             });
+
             // console.log(result.status);
             if(result.status !== 201) console.log("Error inserting friend ID");
             else {  // Print updated user document
@@ -79,90 +242,44 @@ export default function Home(){
                 if(res.status === 200){
                     let user = await res.json();
                     console.log("updated user: ", user);
+                    localStorage.setItem('currentuser', JSON.stringify(user));
                 } else console.log("Error fetching user");
             }
         }
     }
+
+
+    // Construct the final JSX elements
     return (
         <div className="HomeScreen">
             <HomeHeader/>
-             <div className="ListScreens">
+            <div className="ListScreens">
                 <div className="ToPayScreen">
                     <label> Current Transactions To Pay</label>
                     <div className="ListContent">
-                        <ul  className="payList">{loadToPayList()}</ul>
+                        <ul  className="payList">{toPayElement}</ul>
                     </div>
                 </div>
                 <div className="ToBePaidScreen">
                     <label>Current Transactions To Be Paid</label>
                     <div className="ListContent">
-                        <ul className="payList">{loadToBePaidList()}</ul>
+                        <ul className="payList">{toBePaidElement}</ul>
                     </div>
                 </div>
                 <div className="FriendsGroupsScreen">
                     <label>Friends </label>
                     <div className="FriendsListContent">
-                            <form onSubmit={handleSubmit}>  
-                                <div className="searchfriend">
-                                    <input type="text" name = "friendname" placeholder="Search for friend" />
-                                    <input type="submit" value="Add"/>
-                                </div>
-                                {isSubmitted ? (addError ? renderFriendErrorMessage(): renderFriendSuccessMessage()) : <></>}
-                            </form>
-                            <ul className="friendsList">{loadFriendsList()}</ul> 
+                        <form onSubmit={handleSubmit}>
+                            <div className="searchfriend">
+                                <input type="text" name = "friendname" placeholder="Search for friend" />
+                                <input type="submit" value="Add"/>
+                            </div>
+                            {isSubmitted ? (addError ? renderFriendErrorMessage(): renderFriendSuccessMessage()) : <></>}
+                        </form>
+                        <ul className="friendsList">{friendsElement}</ul>
                     </div>
                 </div>
             </div> 
         </div>
-    )}
-
-
-function loadToBePaidList(){
-    let array = [1,2,3,4,5,6,7,8,9,0]
-    return array.map((array)=>{
-        return <button className="PayLi">
-            <label className="Friend_Name">
-                {"Friend: "+array}
-            </label>
-            <label className="Amount">
-                Amount: {array}
-            </label>
-            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
-        
-        </button>
-    })
-
-}
-
-function loadToPayList(){
-    let array = [1,2,3,4,5,6,7,8,9,0]
-    return array.map((array)=>{
-        return <button className="PayLi">
-            <label className="Friend_Name">
-                {"Friend: "+array}
-            </label>
-            <label className="Amount">
-                Amount: {array}
-            </label>
-            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
-        
-        </button>
-    })
-
-}
-
-function loadFriendsList(){
-
-    let array = [1,2,3,4,5,6,7,8,9,0]
-    return array.map((array)=>{
-        return <button className="FriendLi">
-            <label className="Friend">
-                {"Friend: "+array}
-            </label>
-            <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
-
-        
-        </button>
-    })
-
+    );
 }

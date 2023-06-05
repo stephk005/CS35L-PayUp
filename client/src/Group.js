@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Group.css";
 import HomeHeader from "./HomeHeader";
 import CurrencyInput from 'react-currency-input-field';
 
 
 export default function Group() {
-  const [errorMessages, setErrorMessages] = useState({});
-  const [groupList, setGroups] = useState([]);
-  const [isFetching, setFetching] = useState(true);
+  const [rerender, setRerender] = useState(true);
+  let groupList = useRef([]);
+  let isFetching = useRef(true);
 
 
-  let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-  let groupIDs = currentUser.groups;
-
-
-  // useEffect allows database calls to be async and to run before rendering happens
   useEffect(() => {
 
-    setFetching(true);
+    let currentUser = JSON.parse(localStorage.getItem('currentuser'));
+    let groupIDs = currentUser.groups;
     
     parseTransactions();
 
@@ -77,9 +73,6 @@ export default function Group() {
             entry.borrowerNames = [borrower.username];
             entry.borrowerAmounts = [transaction.amount];
 
-            console.log("Start of entry");
-            console.log(entry);
-
           } else { // Add more money to the amount loaned
 
             entry.loanAmount += transaction.amount;
@@ -87,9 +80,6 @@ export default function Group() {
             // Add another borrower + amount borrowed
             entry.borrowerNames.push(borrower.username);
             entry.borrowerAmounts.push(transaction.amount);
-
-            console.log("Entry update");
-            console.log(entry);
           }
         }
 
@@ -97,21 +87,24 @@ export default function Group() {
         tempGroups.push(JSON.parse(JSON.stringify(entry))); // Do this so object is passed by value
       }
       
-      setGroups(tempGroups);
-      setFetching(false);
-      console.log(groupList);
+      if(isFetching.current)
+        setRerender(!rerender);
+
+      groupList.current = tempGroups;
+      isFetching.current = false;
+
     }
     
-  }, [groupIDs.length]);
+  }, [rerender]);
 
   
   // List of group objects has been constructed, time to parse each
 
   let renderTransactions;
   
-  if(isFetching)
+  if(isFetching.current)
     renderTransactions = null;  // Don't render anything while loading
-  else if(groupList.length === 0)
+  else if(groupList.current.length === 0) 
     renderTransactions = (
       <div className="transaction" key={0}>
         <div className="title">No groups to display</div>
@@ -120,7 +113,7 @@ export default function Group() {
   else
     renderTransactions = (
       <div>
-        {groupList.map((group, index) => {
+        {groupList.current.map((group, index) => {
 
           let loanerInfo = `${group.loanerName} paid $${group.loanAmount} dollars.`;
           let borrowerInfo = [];
@@ -143,9 +136,8 @@ export default function Group() {
         })}
       </div>
     ); // Render the list of transactions as 1 group
-  
 
-    
+
   return (
   <div>
     <HomeHeader/>

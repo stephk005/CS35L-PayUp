@@ -8,11 +8,14 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
  
   const dropdownRef = useRef(null);
   const [amounts, setAmounts] = useState({});
-  const [friends, setFriends] = useState(Array());
+  const [rerender, setRerender] = useState(true);
+  let isFetching = useRef(true);
+  let friends = useRef([]);
+
+
   const handleAmountChange = (event, friendName) => {
     const newAmounts = { ...amounts, [friendName]: event.target.value };
     setAmounts(newAmounts);
-
   };
 
   const handleDropdownToggle = () => {
@@ -23,56 +26,56 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
     e.stopPropagation();
   };
 
+
   useEffect(() => {
+
     const closeDropdown = (e) => {
-      if (!dropdownRef.current.contains(e.target)) {
+      if (!dropdownRef.current.contains(e.target))
         dropdownRef.current.classList.remove("is-active");
-      }
     };
 
     document.addEventListener("click", closeDropdown);
 
-    return () => {
-      document.removeEventListener("click", closeDropdown);
-    };
+    return () => { document.removeEventListener("click", closeDropdown); };
   }, []);
-  const friendList = async() => {
-    let currentUser = (JSON.parse(localStorage.getItem("currentuser")))["_id"]
-    let friend_Array = []
-    const url = "http://localhost:5050/record/user/"+ currentUser
-    let result = await fetch(url)
 
-    if(result.ok){ 
+
+
+  useEffect(() => {
+
+    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+    let friendIDs = currentUser.friends;
+
+    loadFriendList();
+
+    async function loadFriendList() {
+      
+      let friendArray = [];
+
       //console.log(await result.json()); 
-      const userData = await result.json();
-      for (const friendID of userData["friends"]){
+      for (const friendID of friendIDs){
           //console.log(friendID)
 
-          const url2 = "http://localhost:5050/record/user/"+ friendID
-          let result2 = await fetch(url2)
-          if(result2.ok){ 
+          const url = "http://localhost:5050/record/user/"+ friendID;
+          let result = await fetch(url);
+          if(result.status === 200){ 
             //console.log(await result2.json()); 
-            const friendData = await result2.json();
-            const tempData = {name: friendData["username"], amount: 0}
-            friend_Array.push(tempData)
+            const friendData = await result.json();
+            const tempData = {name: friendData["username"], amount: 0};
+            friendArray.push(tempData);
           }
           else console.log("Error sending request");
-        
-        
-
       }
+      
+      friends.current = friendArray;
 
+      if(isFetching.current)
+        setRerender(!rerender);
 
+      isFetching.current = false;
     }
-    else{
-       console.log("Error sending request");
-    }
-    console.log(friend_Array)
-
-    setFriends(friend_Array)
-  }
-  friendList()
-
+  }, [rerender]);
+  
 
   return (
 
@@ -84,7 +87,7 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
         <h4>Select friends:</h4>
         <ul className="checkbox-dropdown-list" onClick={handleDropdownClick}>
           {
-            friends.map((friend) => (
+            friends.current.map((friend) => (
             <li key={friend.name}>
               <label>
                 <input
@@ -113,11 +116,13 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
   );
 };
 
+
+
 export default function NewGroup() {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [Amount, setAmount] = useState(0)
-  const [Name,setName] = useState("")
+  const [Name, setName] = useState("")
 
   let [submitData, setSubmitData] = useState({})
 
@@ -135,13 +140,6 @@ export default function NewGroup() {
   };
 
 
-  // console.log("clicked");
-
-  // console.log(selectedFriends);
-  //console.log(submitData);
-
-
-
   const modifyAmount = (temp) =>{
     setAmount(temp.target.value)
 
@@ -152,126 +150,173 @@ export default function NewGroup() {
 
 
   const handleSubmit = async (event) => {
-      //Prevent page reload
-      event.preventDefault();
-      let currentUser = JSON.parse(localStorage.getItem("currentuser"));
-      const addData = async() =>{
-        const id_data = []
-        const url = 'http://localhost:5050/record/transaction/create'
-        for (const borrower of Object.keys(submitData)){
-            let newTransaction = {
-              name:  Name,
-              loaner: currentUser["username"],
-              borrower: borrower,
-              amount:submitData[borrower]
-            };
-            console.log("data: "+newTransaction)
-            let result = await fetch(url, {
-              method: "POST",
-              headers: {
-                  'Content-Type': 'application/json'   // This needs to be included for proper parsing
-              },
-              body: JSON.stringify(newTransaction)
+    //Prevent page reload
+    event.preventDefault();
+    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
 
-            });
-            console.log(result.statusText);
-            if (result.status !== 201) console.log(await result.text());  // Logs errors
-            else {
-                let id = await result.json();  
-                id_data.push(id)
-            }
-        }
-        const url2 = "http://localhost:5050/record/group/create"
-        let temp = Object.keys(submitData)
-        temp.push(currentUser["username"])
-        let data = {
-          name: Name,
-          members: temp,
-          transactions: id_data
-        }
-        let result2 = await fetch(url2, {
+    const addData = async() =>{
+
+      const transactionIDs = [];
+      const userIDs = [currentUser._id];
+      const createTransactionURL = 'http://localhost:5050/record/transaction/create';
+
+      for (const borrowerName of Object.keys(submitData)){
+
+        // Fetch borrower document
+
+        let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
+        let borrower = await fetch(borrowerURL);
+
+        if(borrower.status !== 200)
+          throw new Error("Borrower id not found!");
+
+        borrower = await borrower.json();
+
+
+        // Create transaction
+
+        let newTransaction = {
+          name:  Name,
+          loaner: currentUser._id,
+          borrower: borrower._id,
+          amount: parseFloat(submitData[borrowerName])
+        };
+
+        let transactionRes = await fetch(createTransactionURL, {
           method: "POST",
           headers: {
               'Content-Type': 'application/json'   // This needs to be included for proper parsing
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(newTransaction)
         });
 
-        console.log(result2.statusText);
 
-        if (result2.status !== 201) console.log(await result2.text());  // Logs errors
-        else {
-              let id = await result2.json();  // Converts to proper JS Object
-              console.log(id);
+        if (transactionRes.status !== 201)
+          throw new Error("Couldn't create transaction!");
+        
+        
+        let transactionID = await transactionRes.json();  
+        transactionIDs.push(transactionID);
+        userIDs.push(borrower._id);
 
-        }
 
+        // Insert the transaction into the borrower document
+
+        let insertURL1 = `http://localhost:5050/record/user/insert/transaction/${borrower._id}`;
+
+        let insertRes1 = await fetch(insertURL1, {
+          method: "PATCH",
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id: transactionID})
+        });
+
+        if(insertRes1.status !== 201)
+          throw new Error("Couldn't add transaction to user!");
+
+        
+        // Insert the transaction into the current user document
+        
+        let insertURL2 = `http://localhost:5050/record/user/insert/transaction/${currentUser._id}`;
+
+        let insertRes2 = await fetch(insertURL2, {
+          method: "PATCH",
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id: transactionID})
+        });
+
+        if(insertRes2.status !== 201)
+          throw new Error("Couldn't add transaction to user!");
       }
-      addData()
+
+
+      // Create group with transactions
+
+      const createGroupURL = "http://localhost:5050/record/group/create";
+
+      let newGroup = {
+        name: Name,
+        members: userIDs,
+        transactions: transactionIDs
+      };
+
+      let result = await fetch(createGroupURL, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'   // This needs to be included for proper parsing
+        },
+        body: JSON.stringify(newGroup)
+      });
+
+
+      if (result.status !== 201) 
+        throw new Error("Couldn't create group!");
+      
+      let groupID = await result.json();  // Converts to proper JS Object
+
+
+      // Add group to all member user documents
+      for(let userID of userIDs){
+        let insertURL = `http://localhost:5050/record/user/insert/group/${userID}`;
+
+        let insertRes = await fetch(insertURL, {
+          method: "PATCH",
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id: groupID})
+        });
+
+        if(insertRes.status !== 201)
+          throw new Error("Couldn't add group to user!");
+      }
+
+
+      // Store the updated user in local storage
+
+      let updatedUser = await fetch(`http://localhost:5050/record/user/${currentUser._id}`);
+      updatedUser = await updatedUser.json();
+      localStorage.setItem("currentuser", JSON.stringify(updatedUser));
+      setIsSubmitted(true);
     }
 
+    addData();
+  }
 
 
-
-
-    // const url = 'http://localhost:5050/group/create'
-
-    
-
-      
-
-    //   let dataToAdd = {
-
-    //     name: "",
-    //     members: Object.keys(submitData);,
-    //     transactions: {}
-    //   }
-
-
-    //   let result = await fetch(url, {
-    //       method: "POST",
-    //       headers: {
-    //           'Content-Type': 'application/json'   // This needs to be included for proper parsing
-    //       },
-    //       body: JSON.stringify(dataToAdd)
-    //   });
-
-
-    const renderForm = (
-      <div className="form">
-        <form onSubmit={handleSubmit}>
-          <div className="input-container">
-            <label>Group Name </label>
-            <input type="text" onChange={modifyName} name="groupname" required />
-          </div>
-          <div className="input-container">
-            <label>You paid </label>
-            <input type="number" onChange={modifyAmount} name="paid" required />
-          </div>
-          <DropdownMenu
-            selectedFriends={selectedFriends}
-            handleFriendSelection={handleFriendSelection}
-            setData = {addData}
-          />
-          <div className="button-container">
-            <input type="submit" value="Submit" onClick={handleSubmit} />
-          </div>
-        </form>
-        
-      </div>);
-
-    return (
-      <div>
-        <HomeHeader/>
-        <div className="newgroup">
-          <div className="newgroup-form">
-            {isSubmitted ? <div>Group successfully created</div> : renderForm}
-          </div>
+  const renderForm = (
+    <div className="form">
+      <form onSubmit={handleSubmit}>
+        <div className="input-container">
+          <label>Group Name </label>
+          <input type="text" onChange={modifyName} name="groupname" required />
         </div>
-      </div>);
+        <div className="input-container">
+          <label>You paid </label>
+          <input type="number" onChange={modifyAmount} name="paid" required />
+        </div>
+        <DropdownMenu
+          selectedFriends={selectedFriends}
+          handleFriendSelection={handleFriendSelection}
+          setData = {addData}
+        />
+        <div className="button-container">
+          <input type="submit" value="Submit" onClick={handleSubmit} />
+        </div>
+      </form>
+    </div>);
 
-    
+
+  return (
+    <div>
+      <HomeHeader/>
+      <div className="newgroup">
+        <div className="newgroup-form">
+          {isSubmitted ? <div>Group successfully created</div> : renderForm}
+        </div>
+      </div>
+    </div>);
 }
-
-
-

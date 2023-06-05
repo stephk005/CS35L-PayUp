@@ -53,7 +53,6 @@ export default function Signup() {
     }
     else {
       // console.log("sign up valid");
-      setIsValidSignUp(true);
 
       // Need to make POST request to database
       const url = 'http://localhost:5050/record/user/create';
@@ -73,25 +72,25 @@ export default function Signup() {
             'Content-Type': 'application/json'   // This needs to be included for proper parsing
         },
         body: JSON.stringify(newUser)
-    });
+      });
 
-    // console.log(result.status);
+      // console.log(result.status);
 
-    if (result.status !== 201) console.log(await result.text());  // Logs errors
-    else {
+      if (result.status !== 201) console.log(await result.text());  // Logs errors
+      else {
         let user = await result.json();  // Converts to proper JS Object
         console.log("user", user);
         let userData;
         try{
           const useridResp = await fetch(`http://localhost:5050/record/user/${user}`);
           userData = await useridResp.json();
+          localStorage.setItem("currentuser", JSON.stringify(userData));
+          setIsValidSignUp(true);
         } catch (e) {
           console.error(e);
         }
-        localStorage.setItem("currentuser", JSON.stringify(userData));
+      }
     }
-    }
-
   };
 
   // Generate JSX code for error message
