@@ -84,6 +84,8 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
 export default function NewGroup() {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [Amount, setAmount] = useState(0)
+  const [Name,setName] = useState("")
 
   let [submitData, setSubmitData] = useState({})
 
@@ -101,50 +103,80 @@ export default function NewGroup() {
   };
 
 
-  console.log("clicked");
+  // console.log("clicked");
 
-  console.log(selectedFriends);
-  console.log(submitData);
+  // console.log(selectedFriends);
+  //console.log(submitData);
 
 
+
+  const modifyAmount = (temp) =>{
+    setAmount(temp.target.value)
+
+  }
+  const modifyName = (temp) =>{
+    setName(temp.target.value)
+  }
 
 
   const handleSubmit = async (event) => {
-    //Prevent page reload
-    event.preventDefault();
-    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
-    console.log("submit123");
-    console.log(selectedFriends);
-    console.log(submitData);
-    // const addData = async() =>{
+      //Prevent page reload
+      event.preventDefault();
+      let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+      const addData = async() =>{
+        const id_data = []
+        const url = 'http://localhost:5050/record/transaction/create'
+        for (const borrower of Object.keys(submitData)){
+            let newTransaction = {
+              name:  Name,
+              loaner: currentUser["username"],
+              borrower: borrower,
+              amount:submitData[borrower]
+            };
+            console.log("data: "+newTransaction)
+            let result = await fetch(url, {
+              method: "POST",
+              headers: {
+                  'Content-Type': 'application/json'   // This needs to be included for proper parsing
+              },
+              body: JSON.stringify(newTransaction)
 
+            });
+            console.log(result.statusText);
+            if (result.status !== 201) console.log(await result.text());  // Logs errors
+            else {
+                let id = await result.json();  
+                id_data.push(id)
+            }
+        }
+        const url2 = "http://localhost:5050/record/group/create"
+        let temp = Object.keys(submitData)
+        temp.push(currentUser["username"])
+        let data = {
+          name: Name,
+          members: temp,
+          transactions: id_data
+        }
+        let result2 = await fetch(url2, {
+          method: "POST",
+          headers: {
+              'Content-Type': 'application/json'   // This needs to be included for proper parsing
+          },
+          body: JSON.stringify(data)
+        });
 
-    //   const url = 'http://localhost:5050/transaction/create'
-    //   for (const borrower in Object.keys(submitData)){
-    //       let newTransaction = {
-    //         name:  "test1",
-    //         loaner: currentUser,
-    //         borrower: borrower,
-    //         amount:submitData[borrower]
-    //       };
-    //       let result = await fetch(url, {
-    //         method: "POST",
-    //         headers: {
-    //             'Content-Type': 'application/json'   // This needs to be included for proper parsing
-    //         },
-    //         body: JSON.stringify(newTransaction)
+        console.log(result2.statusText);
 
-    //     });
-    //     console.log(result.statusText);
+        if (result2.status !== 201) console.log(await result2.text());  // Logs errors
+        else {
+              let id = await result2.json();  // Converts to proper JS Object
+              console.log(id);
 
-    //     if (result.status !== 201) console.log(await result.text());  // Logs errors
-    //     else {
-    //         let user = await result.json();  // Converts to proper JS Object
-    //         console.log(user);
-    //     }
-       }
+        }
 
-      
+      }
+      addData()
+    }
 
 
 
@@ -178,21 +210,22 @@ export default function NewGroup() {
         <form onSubmit={handleSubmit}>
           <div className="input-container">
             <label>Group Name </label>
-            <input type="text" name="groupname" required />
+            <input type="text" onChange={modifyName} name="groupname" required />
           </div>
           <div className="input-container">
             <label>You paid </label>
-            <input type="number" name="paid" required />
+            <input type="number" onChange={modifyAmount} name="paid" required />
           </div>
           <DropdownMenu
             selectedFriends={selectedFriends}
             handleFriendSelection={handleFriendSelection}
             setData = {addData}
           />
+          <div className="button-container">
+            <input type="submit" value="Submit" onClick={handleSubmit} />
+          </div>
         </form>
-        <div className="button-container">
-          <input type="submit" value="Submit" />
-        </div>
+        
       </div>);
 
     return (

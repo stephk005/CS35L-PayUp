@@ -1,0 +1,39 @@
+.friendprofile {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #a597ec;
+    align-items: center;
+  }
+
+  .friendprofileinfo {
+    margin-top: 10vh;
+    background-color: rgb(255, 255, 255);
+    padding: 2rem;
+    width: 70vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .friendprofileinfo p{
+    display: flex;
+    align-items: center;
+  }
+
+  .friendlabel {
+    margin-right: 1rem;
+  }
+
+  .frienditem {
+    margin-left: 1rem;
+  }
+
+  .friendremove{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .remove_link{
+    color:white;
+    text-decoration: none;
+  }
