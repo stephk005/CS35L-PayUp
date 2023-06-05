@@ -7,6 +7,7 @@ import CurrencyInput from 'react-currency-input-field';
 export default function Group() {
   const [errorMessages, setErrorMessages] = useState({});
   const [groupList, setGroups] = useState([]);
+  const [isFetching, setFetching] = useState(true);
 
 
   let currentUser = JSON.parse(localStorage.getItem('currentuser'));
@@ -16,6 +17,8 @@ export default function Group() {
   // useEffect allows database calls to be async and to run before rendering happens
   useEffect(() => {
 
+    setFetching(true);
+    
     parseTransactions();
 
     async function parseTransactions() {
@@ -59,6 +62,10 @@ export default function Group() {
 
           if(loaner.status !== 200 || borrower.status !== 200)
             throw new Error("Invalid user in transaction!");
+
+          
+          loaner = await loaner.json();
+          borrower = await borrower.json();
           
           // Entry doesn't have a loaner/borrower yet
           if(!entry.loanerName){
@@ -70,6 +77,9 @@ export default function Group() {
             entry.borrowerNames = [borrower.username];
             entry.borrowerAmounts = [transaction.amount];
 
+            console.log("Start of entry");
+            console.log(entry);
+
           } else { // Add more money to the amount loaned
 
             entry.loanAmount += transaction.amount;
@@ -77,6 +87,9 @@ export default function Group() {
             // Add another borrower + amount borrowed
             entry.borrowerNames.push(borrower.username);
             entry.borrowerAmounts.push(transaction.amount);
+
+            console.log("Entry update");
+            console.log(entry);
           }
         }
 
@@ -85,47 +98,54 @@ export default function Group() {
       }
       
       setGroups(tempGroups);
+      setFetching(false);
+      console.log(groupList);
     }
     
   }, [groupIDs.length]);
 
-
   
   // List of group objects has been constructed, time to parse each
 
-  let renderTransactions = (
-    <div>
-      {groupList.map((group, index) => {
-
-        let loanerInfo = `${group.loanerName} paid $${group.loanAmount} dollars.`;
-        let borrowerInfo = [];
-
-        for(let i in group.borrowerNames)
-          borrowerInfo.push(`${group.borrowerNames[i]} owes ${group.loanerName} $${group.borrowerAmounts[i]} dollars.`);
-
-        // Render the transaction information
-        return (
-          <div className="transaction" key={index}>
-            <div className="title">{group.name}</div>
-            <div className="lender">{loanerInfo}</div>
-            <div className="borrower">
-              {borrowerInfo.map((info, index) => (
-                <div key={index}>{info}</div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  let renderTransactions;
   
-  if(groupList.length === 0)
+  if(isFetching)
+    renderTransactions = null;  // Don't render anything while loading
+  else if(groupList.length === 0)
     renderTransactions = (
       <div className="transaction" key={0}>
         <div className="title">No groups to display</div>
       </div>
-    );
+    );  // Render a disclaimer, no groups
+  else
+    renderTransactions = (
+      <div>
+        {groupList.map((group, index) => {
 
+          let loanerInfo = `${group.loanerName} paid $${group.loanAmount} dollars.`;
+          let borrowerInfo = [];
+
+          for(let i in group.borrowerNames)
+            borrowerInfo.push(`${group.borrowerNames[i]} owes ${group.loanerName} $${group.borrowerAmounts[i]} dollars.`);
+
+          // Render the transaction information
+          return (
+            <div className="transaction" key={index}>
+              <div className="title">{group.name}</div>
+              <div className="lender">{loanerInfo}</div>
+              <div className="borrower">
+                {borrowerInfo.map((info, index) => (
+                  <div key={index}>{info}</div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ); // Render the list of transactions as 1 group
+  
+
+    
   return (
   <div>
     <HomeHeader/>
