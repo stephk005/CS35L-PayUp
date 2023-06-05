@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./NewGroup.css";
-import Header from "./Header";
+import HomeHeader from "./HomeHeader";
 
 
 
@@ -8,6 +8,7 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
  
   const dropdownRef = useRef(null);
   const [amounts, setAmounts] = useState({});
+  const [friends, setFriends] = useState(Array());
   const handleAmountChange = (event, friendName) => {
     const newAmounts = { ...amounts, [friendName]: event.target.value };
     setAmounts(newAmounts);
@@ -35,13 +36,43 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
       document.removeEventListener("click", closeDropdown);
     };
   }, []);
+  const friendList = async() => {
+    let currentUser = (JSON.parse(localStorage.getItem("currentuser")))["_id"]
+    let friend_Array = []
+    const url = "http://localhost:5050/record/user/"+ currentUser
+    let result = await fetch(url)
 
-  const friends = [
-    { name: "Ian", amount: 0 },
-    { name: "Cris", amount: 0 },
-    { name: "Henry", amount: 0 },
-    { name: "Steph", amount: 0 },
-  ];
+    if(result.ok){ 
+      //console.log(await result.json()); 
+      const userData = await result.json();
+      for (const friendID of userData["friends"]){
+          //console.log(friendID)
+
+          const url2 = "http://localhost:5050/record/user/"+ friendID
+          let result2 = await fetch(url2)
+          if(result2.ok){ 
+            //console.log(await result2.json()); 
+            const friendData = await result2.json();
+            const tempData = {name: friendData["username"], amount: 0}
+            friend_Array.push(tempData)
+          }
+          else console.log("Error sending request");
+        
+        
+
+      }
+
+
+    }
+    else{
+       console.log("Error sending request");
+    }
+    console.log(friend_Array)
+
+    setFriends(friend_Array)
+  }
+  friendList()
+
 
   return (
 
@@ -52,7 +83,8 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
       <div className="dropdown-menu checkbox-dropdown" ref={dropdownRef} onClick={handleDropdownToggle}>
         <h4>Select friends:</h4>
         <ul className="checkbox-dropdown-list" onClick={handleDropdownClick}>
-          {friends.map((friend) => (
+          {
+            friends.map((friend) => (
             <li key={friend.name}>
               <label>
                 <input
@@ -230,7 +262,7 @@ export default function NewGroup() {
 
     return (
       <div>
-        <Header/>
+        <HomeHeader/>
         <div className="newgroup">
           <div className="newgroup-form">
             {isSubmitted ? <div>Group successfully created</div> : renderForm}
@@ -240,3 +272,6 @@ export default function NewGroup() {
 
     
 }
+
+
+
