@@ -11,9 +11,6 @@ export default function Profile() {
     const navigate = useNavigate();
 
     let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-    // console.log("current user (profile): ", currentUser);
-    // let email = currentUser.email;
-    // let username = currentUser.username;
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
 
@@ -26,22 +23,17 @@ export default function Profile() {
         //Prevent page reload
         event.preventDefault();
         console.log("signout user: ", localStorage.getItem('currentuser'));
-        // console.log("b4 length: ", localStorage.length);
 
         if (localStorage.length <= 0) // if user is not saved in localstorage
         {
             const message = `An error has occured with sign out:`;
             window.alert(message);
         }
-        else {
+        else { // handle sign out
             setEmail("");
             setUsername("");
             localStorage.clear();
             setIsSubmitted(true);
-            // console.log("clear");
-            
-            // console.log("clear after");
-            // console.log("aft length: ", localStorage.length);
         }
 
       };
@@ -61,11 +53,9 @@ export default function Profile() {
           <div className="form">
             <form onSubmit={handleSubmit}>
                   <div className="signout">
-                    {/* <a href="http://localhost:3000/Welcome"> */}
-                      <div className="button-container">
-                        <input type="submit" value="Sign out" />
-                      </div>
-                    {/* </a> */}
+                    <div className="button-container">
+                      <input type="submit" value="Sign out" />
+                    </div>
                   </div>
             </form>
           </div>
@@ -77,8 +67,6 @@ export default function Profile() {
             <HomeHeader/>
             <div className="profile">
                 {isSubmitted ? navigate("/") : renderForm}
-                {/* <Link className = "signout_link" to="/">Sign out</Link> */}
-
             </div>
       </div>
       );

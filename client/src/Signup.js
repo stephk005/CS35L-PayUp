@@ -4,27 +4,14 @@ import "./Signup.css"
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
 
-// TODO : validate emails
-/*
-function ValidateEmail(mail)
-{
- if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(myForm.emailAddr.value))
-  {
-    return (true)
-  }
-    alert("You have entered an invalid email address!")
-    return (false)
-}
-*/
-
 export default function Signup() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isValidSignUp, setIsValidSignUp] = useState(false);
   const navigate = useNavigate();
-
   const signup_errors = {
     email: "Email already in use. ",
-    uname: "Username already in use. "
+    uname: "Username already in use. ",
+    invalid_email: "Enter a valid email."
   };
 
   const handleSubmit = async (event) => {
@@ -32,14 +19,12 @@ export default function Signup() {
     //Prevent page reload
     event.preventDefault();
     var { email, uname, pass} = document.forms[0];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Make get request to find user with specific username
     // console.log("email: ", email.value, " | uname: ", uname.value, " | pass: ", pass.value)
     const usernameResp = await fetch(`http://localhost:5050/record/user/username/${uname.value}`);
     const emailResp = await fetch(`http://localhost:5050/record/user/email/${email.value}`);
-
-    // console.log('userrep, ', usernameResp);
-    // console.log('emailrep, ', emailResp);
 
     if (!usernameResp.ok && usernameResp.statusText !== "Not Found"){
       const message = `An error has occured: ${usernameResp.statusText}`;
@@ -56,9 +41,10 @@ export default function Signup() {
     // Compare user info
     console.log("emailresptext: ", emailResp.statusText);
     if (await emailResp.statusText !== "Not Found") {
-      // Email already in use
-      // console.log("email in use");
       setErrorMessages({ name: "err_email", message: signup_errors.email });
+    }
+    else if(!emailRegex.test(email.value)) {
+      setErrorMessages({ name: "err_invalid_email", message: signup_errors.invalid_email });
     }
     else if (await usernameResp.statusText !== "Not Found"){
       // Username already in use
@@ -99,13 +85,10 @@ export default function Signup() {
         try{
           const useridResp = await fetch(`http://localhost:5050/record/user/${user}`);
           userData = await useridResp.json();
-          // console.log("userdata(resp),", userData);
         } catch (e) {
           console.error(e);
         }
         localStorage.setItem("currentuser", JSON.stringify(userData));
-        // let currentUser = JSON.parse(localStorage.getItem("currentuser"));
-        // console.log("user(signup) ", currentUser);
     }
     }
 
@@ -125,6 +108,7 @@ export default function Signup() {
           <label>Email Address </label>
           <input type="text" name="email" required />
           {renderErrorMessage("err_email")}
+          {renderErrorMessage("err_invalid_email")}
         </div>
         <div className="input-container">
           <label>Username </label>
