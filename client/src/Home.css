@@ -1,7 +1,6 @@
 .HomeScreen{
     height: 100vh;
     width: 100vw;
-    outline: 2px solid purple;
     display: flex;
     flex-direction: column;
 }
@@ -12,7 +11,9 @@
     display: flex;
     max-height: 100%;
     overflow: hidden;
-    
+    padding-top: 20px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: large;
 }
 .ToPayScreen{
     height: 100%;
@@ -41,18 +42,21 @@
 }
 
 .payList{
-    height: 20%;
+    height: 10%;
     width: 90%;
     max-height: 100%;
     overflow: auto;
-
+    border-radius: 25px;
+    border: 2px solid;
 }
 
 .friendsList{
-    height: 20%;
+    height: 10%;
     width: 80%;
     max-height: 100%;
     overflow: auto;
+    border-radius: 15px;
+    border: 2px solid;
 }
 
 
@@ -60,7 +64,7 @@
 .ListContent{
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: center;
     justify-content: center;
     /* margin: 1rem; */
     outline: 1px solid purple;
@@ -80,9 +84,9 @@
 
 }
 .PayLi{
-    height: 20vh;
+    height: 10vh;
     width: 100%;
-    outline: 1px solid purple;
+    outline: 0px solid purple;
     display: flex;
     flex-direction: row
 

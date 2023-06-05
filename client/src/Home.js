@@ -11,7 +11,8 @@ export default function Home(){
     let toBePaidList = useRef([]);
     let toPayList = useRef([]);
     let friends = useRef([]);
-    let isFetching = useRef(true);
+    let isFetching1 = useRef(true);
+    let isFetching2 = useRef(true);
 
 
 
@@ -23,11 +24,6 @@ export default function Home(){
 
         loadPayLists();
         loadFriendList();
-
-        if(isFetching.current)
-            setRerender(!rerender);
-
-        isFetching.current = false;
 
 
         // Load Transaction Lists
@@ -74,6 +70,11 @@ export default function Home(){
             }
             toPayList.current = tempToPayList;
             toBePaidList.current = tempToBePaidList;
+
+            if(isFetching1.current && !isFetching2.current)
+                setRerender(!rerender);
+
+            isFetching1.current = false;
         }
 
 
@@ -94,6 +95,11 @@ export default function Home(){
                 else console.log("Error sending request");
             }
             friends.current = friendArray;
+
+            if(isFetching2.current && !isFetching1.current)
+                setRerender(!rerender);
+
+            isFetching2.current = false;
         }
 
     }, [rerender]);
@@ -106,7 +112,9 @@ export default function Home(){
     let toBePaidElement;
     let friendsElement;
 
-    if(isFetching.current)
+    let fetching = isFetching1.current || isFetching2.current;
+
+    if(fetching)
         toPayElement = null;
     else if(toPayList.current.length === 0)
         toPayElement = (
@@ -127,7 +135,7 @@ export default function Home(){
         });
 
     
-    if(isFetching.current)
+    if(fetching)
         toBePaidElement = null;
     else if(toBePaidList.current.length === 0)
         toBePaidElement = (
@@ -148,7 +156,7 @@ export default function Home(){
         });
     
     
-    if(isFetching.current)
+    if(fetching)
         friendsElement = null;
     else if(friends.current.length === 0)
         friendsElement = (
