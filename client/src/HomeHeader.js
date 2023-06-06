@@ -7,30 +7,30 @@ import { useNavigate } from 'react-router-dom';
 export default function HomeHeader() {
     const navigate = useNavigate(); 
     const handleClick = async (event) => {
-        event.preventDefault();
-        console.log("CLICK BALANCE", localStorage);
-        let currentUser = JSON.parse(localStorage.getItem('currentuser')) 
-        let friends = currentUser.friends; //grab list of friends given user
-        // console.log("friend id", friends[0]);
-        let friend = friends[0]; // temp friend -> first friend on friends list
-        const friendidResp = await fetch(`http://localhost:5050/record/user/${friend}`);
+        // event.preventDefault();
+        // console.log("CLICK BALANCE", localStorage);
+        // let currentUser = JSON.parse(localStorage.getItem('currentuser')) 
+        // let friends = currentUser.friends; //grab list of friends given user
+        // // console.log("friend id", friends[0]);
+        // let friend = friends[0]; // temp friend -> first friend on friends list
+        // const friendidResp = await fetch(`http://localhost:5050/record/user/${friend}`);
 
-        //fetch friend data 
-        if (friendidResp.statusText !== "Not Found" && !friendidResp.ok){
-            const message = `An error has occured: ${friendidResp.statusText}`;
-            window.alert(message);
-            return;
-        }
-        let friendData;
-        try{
-        friendData = await friendidResp.json();
-        // console.log("friend data: ", friendData);
-        localStorage.setItem("currentfriend", JSON.stringify(friendData));
-        console.log("CLICK BALANCE BOT ", localStorage);
-        navigate("/FriendProfile")
-        } catch (e) {
-        console.error(e);
-        }
+        // //fetch friend data 
+        // if (friendidResp.statusText !== "Not Found" && !friendidResp.ok){
+        //     const message = `An error has occured: ${friendidResp.statusText}`;
+        //     window.alert(message);
+        //     return;
+        // }
+        // let friendData;
+        // try{
+        // friendData = await friendidResp.json();
+        // // console.log("friend data: ", friendData);
+        // localStorage.setItem("currentfriend", JSON.stringify(friendData));
+        // console.log("CLICK BALANCE BOT ", localStorage);
+        // navigate("/FriendProfile")
+        // } catch (e) {
+        // console.error(e);
+        // }
     };
     return (
         <div className="homeheader">

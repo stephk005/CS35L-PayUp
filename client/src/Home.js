@@ -130,7 +130,9 @@ export default function Home(){
     }, [rerender]);
 
 
-
+    const setFriendProfileID = async(id)=>{
+        localStorage.setItem("currentfriend",id);
+    }
 
     // Create the elements based off the updated object lists
     let toPayElement;
@@ -197,7 +199,7 @@ export default function Home(){
                 <label className="Friend">
                     {friend.name}
                 </label>
-                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
+                <Link className= "To_Friend" onClick={()=>{setFriendProfileID(friend.name)}} to = "/Profile"> View Profile</Link>
             </button>);
         });
 
