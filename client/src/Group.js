@@ -37,7 +37,8 @@ export default function Group() {
           "loanerName": null, // Should be another object, in the form {"name": amount}
           "loanAmount": null,
           "borrowerNames": null,  // Should be a list of objects, in the form [{"name": amount}]
-          "borrowerAmounts": null
+          "borrowerAmounts": null,
+          "isPaid": {}
         };
 
         // Loop through transaction IDs and fill up the entry
@@ -72,6 +73,7 @@ export default function Group() {
             // Add first borrower + amount borrowed
             entry.borrowerNames = [borrower.username];
             entry.borrowerAmounts = [transaction.amount];
+            entry.isPaid[borrower.username] = transaction.isPaid
 
           } else { // Add more money to the amount loaned
 
@@ -118,8 +120,16 @@ export default function Group() {
           let loanerInfo = `${group.loanerName} paid $${group.loanAmount} dollars.`;
           let borrowerInfo = [];
 
-          for(let i in group.borrowerNames)
-            borrowerInfo.push(`${group.borrowerNames[i]} owes ${group.loanerName} $${group.borrowerAmounts[i]} dollars.`);
+          for(let i in group.borrowerNames){
+
+            let temp =`${group.borrowerNames[i]} owes ${group.loanerName} $${group.borrowerAmounts[i]} dollars`
+            if (group.isPaid[group.borrowerNames[i]]){
+              borrowerInfo.push(temp+": PAID")
+            }
+            else{
+              borrowerInfo.push(temp)
+            }
+          }
 
           // Render the transaction information
           return (
