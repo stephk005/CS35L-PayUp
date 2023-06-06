@@ -142,7 +142,14 @@ router.patch("/user/insert/friend/:id", async (req, res) => {
   let arrayAction = {$push: {friends: friendID}};
   let result = await collection.updateOne(query, arrayAction);
 
-  if(result) res.status(201).send("SUCCESS");
+
+
+  let query2 = {_id: new ObjectId(friendID)}
+  let action = {$push: {friends: req.params.id}}
+  let result2 = await collection.updateOne(query2,action)
+
+
+  if(result && result2) res.status(201).send("SUCCESS");
   else res.status(500).send("INSERT_ERROR");  // Insertion failed for other reason
 });
 
