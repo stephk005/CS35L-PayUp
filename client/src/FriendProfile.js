@@ -54,14 +54,13 @@ export default function FriendProfile() {
     const handleFriendSubmit = async (event) => {
         //Prevent page reload
         event.preventDefault();
-        setIsSubmitted(true);
         if (localStorage.getItem('currentfriend') === null && !isSubmitted) // if user is not saved in localstorage
         {
             const message = `An error has occured with remove friend:`;
             window.alert(message);
         }
         else {
-          currentUser = JSON.parse(localStorage.getItem('currentuser'))
+          let currentUser = JSON.parse(localStorage.getItem('currentuser'))
           const friendUrl = "http://localhost:5050/record/user/username/"+ localStorage.getItem('currentfriend')
           let friendResult = await fetch(friendUrl)
           let friendID_data = ""
