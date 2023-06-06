@@ -14,26 +14,29 @@ PayUp is a web application that keeps track of your expenses for you. Users can 
     8. Easy navigation through the homepage. 
 
 ## Running the App 
-Clone the repository: 
-##### 'git clone https://github.com/stephk005/CS35L-PayUp.git'
+Run the following commands:
+```
+git clone https://github.com/stephk005/CS35L-PayUp.git'
+cd CS35L-PayUp
+```
 
-CD into the repository:
-##### 'cd CS35L-Payup'
+## Setting up the backend:
 
-### Set up backend locally:
+```
+cd server
+```
 
-##### 'cd server'
+##### Create a MongoDB account at https://cloud.mongodb.com/. Create a .env in the server directory, and write 'MONGO_DB_URI = YOUR_MONGO_DB_URI' to the file. 
 
-##### Create a MongoDB account at https://cloud.mongodb.com/. Create a .env in the server directory, and write 'MONGO_DB_URI = ADD_URL_HERE' to the file. 
+## Set up frontend:
+```
+cd client
 
-### Set up frontend:
+npm install
 
-##### cd client
+npm install react-currency-input-field
 
-##### npm install
-
-##### npm install react-currency-input-field
-
-##### npm start
+npm start
+```
 
 You should see the website at http://localhost:3000 in the browser if the backend and frontend are set up correctly. 
