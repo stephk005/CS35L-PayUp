@@ -197,7 +197,7 @@ export default function Home(){
                 <label className="Friend">
                     {friend.name}
                 </label>
-                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
             </button>);
         });
 
