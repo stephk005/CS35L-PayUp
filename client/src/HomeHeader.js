@@ -42,7 +42,7 @@ export default function HomeHeader() {
             <label onClick={handleClick}>Balance</label>
             </div>
             <div className="homeheader_tempgroup_link">
-            <Link className = "homeheader_link" to="/Group">TempGroup</Link>
+            <Link className = "homeheader_link" to="/Group">Group</Link>
             </div>
             <div className="homeheader_profile_link">
             <Link className = "homeheader_link" to="/Profile">Profile</Link>
