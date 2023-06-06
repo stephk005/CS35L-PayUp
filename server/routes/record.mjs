@@ -390,7 +390,8 @@ router.post("/transaction/create", async (req, res) => {
     name: req.body.name,
     loaner: req.body.loaner,  // _id
     borrower: req.body.borrower,  // _id
-    amount: req.body.amount  // double
+    amount: req.body.amount,  // double
+    isPaid: false
   };
 
   if(Object.values(newTransaction).includes(undefined)){
@@ -405,6 +406,21 @@ router.post("/transaction/create", async (req, res) => {
   else res.status(500).send("CREATE_ERROR");  // Insertion failed for other reason
 });
 
+
+//Set a transaction to be Paid
+router.patch("/transaction/setAsPaid/:id",async(req,res) =>{
+  let set = req.body.set;
+  console.log("set: "+set)
+  let collection = await db.collection("transactions");
+  let query = {_id: new ObjectId(req.params.id)}
+  let action = {$set: {isPaid: set}}
+  let result = await collection.updateOne(query,action)
+
+  if(result) res.status(201).send(req.params.id);
+  else res.status(500).send("data: "+id+set)
+
+
+})
 
 // Allows update of transaction amount
 router.patch("/transaction/update/:id", async (req, res) => {

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import "./Home.css";
 import HomeHeader from "./HomeHeader";
@@ -14,6 +15,26 @@ export default function Home(){
     let isFetching1 = useRef(true);
     let isFetching2 = useRef(true);
 
+
+
+    const setIsPaid = async(id) =>{
+
+        console.log("the id: ", id)
+        let url = "http://localhost:5050/record/transaction/setAsPaid/"+id
+        let result = await fetch(url, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({set: true})
+        })
+        if (result.status !== 201){
+            console.log( await result.json())
+            throw new Error("Couldn't create transaction!");
+        }
+
+
+    }
 
 
     useEffect(() => {
@@ -55,7 +76,8 @@ export default function Home(){
 
                 let entry = {
                     user: null, // This is the user you borrowed/lent money from/to
-                    amount: transaction.amount
+                    amount: transaction.amount,
+                    id: transaction._id
                 };
 
                 if(loaner.username === user.username){
@@ -80,11 +102,11 @@ export default function Home(){
 
         // Load Friend List
         async function loadFriendList() {
-      
+    
             let friendArray = [];
-      
+    
             for (const friendID of friendIDs){
-      
+    
                 const url = "http://localhost:5050/record/user/"+ friendID;
                 let result = await fetch(url);
                 if(result.status === 200){ 
@@ -105,7 +127,7 @@ export default function Home(){
     }, [rerender]);
 
 
-    
+
 
     // Create the elements based off the updated object lists
     let toPayElement;
@@ -131,10 +153,13 @@ export default function Home(){
                     Amount: ${transaction.amount}
                 </label>
                 <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+                <button onClick={function(){
+                    setAsPaid(transaction.id)
+                }}> Set As Paid</button>
             </button>);
         });
 
-    
+
     if(fetching)
         toBePaidElement = null;
     else if(toBePaidList.current.length === 0)
@@ -154,8 +179,8 @@ export default function Home(){
                 <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
             </button>);
         });
-    
-    
+
+
     if(fetching)
         friendsElement = null;
     else if(friends.current.length === 0)
@@ -172,8 +197,8 @@ export default function Home(){
                 <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
             </button>);
         });
-    
-    
+
+
 
     // Accepting new friend stuff
     const renderFriendErrorMessage = () =>
@@ -196,7 +221,7 @@ export default function Home(){
         var {friendname} = document.forms[0];
         // console.log("friendname: ", friendname.value);
         // Generate JSX code for error message
-    
+
         const usernameResp = await fetch(`http://localhost:5050/record/user/username/${friendname.value}`);
 
         if (usernameResp.status !== 200){ //if friend isnt found
