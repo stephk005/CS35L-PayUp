@@ -17,7 +17,7 @@ export default function Home(){
 
 
 
-    const setIsPaid = async(id) =>{
+    const setAsPaid = async(id) =>{
 
         console.log("the id: ", id)
         let url = "http://localhost:5050/record/transaction/setAsPaid/"+id
@@ -71,23 +71,26 @@ export default function Home(){
                 if(loaner.status !== 200 || borrower.status !== 200)
                     throw new Error("Invalid user in transaction!");
                 
-                loaner = await loaner.json();
-                borrower = await borrower.json();
 
-                let entry = {
-                    user: null, // This is the user you borrowed/lent money from/to
-                    amount: transaction.amount,
-                    id: transaction._id
-                };
+                if(!transaction.isPaid){
+                    loaner = await loaner.json();
+                    borrower = await borrower.json();
 
-                if(loaner.username === user.username){
-                    entry.user = borrower.username;
-                    tempToBePaidList.push(JSON.parse(JSON.stringify(entry)));
-                } else if(borrower.username === user.username) {
-                    entry.user = loaner.username;
-                    tempToPayList.push(JSON.parse(JSON.stringify(entry)));
-                } else
-                    throw new Error("Transaction doesn't involve current user!");
+                    let entry = {
+                        user: null, // This is the user you borrowed/lent money from/to
+                        amount: transaction.amount,
+                        id: transaction._id
+                    };
+
+                    if(loaner.username === user.username){
+                        entry.user = borrower.username;
+                        tempToBePaidList.push(JSON.parse(JSON.stringify(entry)));
+                    } else if(borrower.username === user.username) {
+                        entry.user = loaner.username;
+                        tempToPayList.push(JSON.parse(JSON.stringify(entry)));
+                    } else
+                        throw new Error("Transaction doesn't involve current user!");
+                }
                 
             }
             toPayList.current = tempToPayList;
