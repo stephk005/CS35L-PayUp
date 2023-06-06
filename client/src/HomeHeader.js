@@ -1,12 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./HomeHeader.css";
 import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
 
 
 export default function HomeHeader() {
-    const navigate = useNavigate(); 
-    const handleClick = async (event) => {
+    const [balance, setBalance] = useState();
+
+    useEffect(() => {
+
+        let user = JSON.parse(localStorage.getItem('currentuser'));
+        let transactionIDs = user.transactions;
+
+        loadPayLists();
+        let net = 0;
+
+        async function loadPayLists(){
+        for(let transactionID of transactionIDs){
+            let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
+
+            let res = await fetch(transactionURL);
+
+            if(res.status !== 200)
+                throw new Error("Invalid transaction ID in user!");   
+            let transaction = await res.json();
+            
+            if(!transaction.isPaid){
+                if(transaction.loaner === user._id){
+                    net += transaction.amount;
+                } else if(transaction.borrower === user._id) {
+                    net -= transaction.amount;
+                } else {
+                    throw new Error("Error calculating balance!");
+                }
+            }
+        }
+        setBalance(net);
+
+}}, []);
+
+    // const handleClick = async (event) => {
         // event.preventDefault();
         // console.log("CLICK BALANCE", localStorage);
         // let currentUser = JSON.parse(localStorage.getItem('currentuser')) 
@@ -31,7 +63,7 @@ export default function HomeHeader() {
         // } catch (e) {
         // console.error(e);
         // }
-    };
+    // };
     return (
         <div className="homeheader">
             <div className="homeheader_welcome">
@@ -39,7 +71,7 @@ export default function HomeHeader() {
             </div>
             <div className="homeheader_balance">
             {/* <Link className = "homeheader_link" to="/FriendProfile" onClick={() => handleClick()} >Balance</Link> */}
-            <label onClick={handleClick}>Balance</label>
+            <label>Balance: ${balance}</label>
             </div>
             <div className="homeheader_tempgroup_link">
             <Link className = "homeheader_link" to="/Group">Group</Link>
