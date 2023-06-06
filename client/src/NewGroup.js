@@ -1,18 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./NewGroup.css";
 import HomeHeader from "./HomeHeader";
+import CurrencyInput from 'react-currency-input-field';
 
 
+  
 
-const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
- 
+const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMessages}) => {
   const dropdownRef = useRef(null);
   const [amounts, setAmounts] = useState({});
   const [rerender, setRerender] = useState(true);
   let isFetching = useRef(true);
   let friends = useRef([]);
 
+  // const [errorMessages, setErrorMessages] = useState({});
 
+  console.log("ERROR MESSAGES: ", errorMessages.message);
+  
+  const friend_errors = {
+    amount: "Must enter an amount",
+    friend: "Must choose a friend", 
+  };
+
+  // Generate JSX code for error message
+  const renderErrorMessage = (name) =>
+    name === errorMessages.name && (
+      <div className="error">{errorMessages.message}</div>
+    );
+    
   const handleAmountChange = (event, friendName) => {
     const newAmounts = { ...amounts, [friendName]: event.target.value };
     setAmounts(newAmounts);
@@ -101,12 +116,15 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData}) => {
             </li>
           ))}
         </ul>
+        {renderErrorMessage("err_friend")}
         {selectedFriends.length > 0 && (
           <div className="selected-friends">
             <h4>Selected Friends:</h4>
             {selectedFriends.map((friend) => (
               <div key={friend}>
-                {friend}: <input type="number" value={amounts[friend]} onChange={(event) => handleAmountChange(event, friend)} />
+                {/* {friend}: <input type="number" value={amounts[friend]} onChange={(event) => handleAmountChange(event, friend)} /> */}
+                {friend} will pay ($): <CurrencyInput name="pay" value={amounts[friend]} allowNegativeValue={false}  disableAbbreviations={true} disableGroupSeparators={true} required/>
+                {renderErrorMessage("err_friendamount")}
               </div>
             ))}
           </div>
@@ -123,6 +141,19 @@ export default function NewGroup() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [Amount, setAmount] = useState(0)
   const [Name, setName] = useState("")
+  const [errorMessages, setErrorMessages] = useState({});
+
+  const submit_errors = {
+    groupname: "Must enter group name",
+    amount: "Must enter an amount",
+    friend: "Must choose a friend", 
+  };
+
+  // Generate JSX code for error message
+  const renderErrorMessage = (name) =>
+    name === errorMessages.name && (
+      <div className="error">{errorMessages.message}</div>
+    );
 
   let [submitData, setSubmitData] = useState({})
 
@@ -141,8 +172,8 @@ export default function NewGroup() {
 
 
   const modifyAmount = (temp) =>{
+    console.log("amt called");
     setAmount(temp.target.value)
-
   }
   const modifyName = (temp) =>{
     setName(temp.target.value)
@@ -153,15 +184,47 @@ export default function NewGroup() {
     //Prevent page reload
     event.preventDefault();
     let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+    // console.log("Submit data:", submitData);
+    // console.log("name=", Name, ".")
+    // console.log("l: ", selectedFriends.length)
+    // console.log("FEASFD", document.forms[0]);
+    var { groupname, paid, friends, pay} = document.forms[0];
+    // console.log("HELLO", document.forms[0].elements);
+    // console.log("groupname: ", groupname);
+    // console.log("paid: ", paid);
+    // console.log("friends: ", friends);
+    // console.log("pay: ", pay);
 
+    console.log("length: ", selectedFriends.length);
+    if (selectedFriends.length == 0)
+    {
+      console.log("4");
+      setErrorMessages({ name: "err_friend", message: submit_errors.friend });
+    }
+    if (paid.value <= 0 || paid.value === '')
+    {
+      console.log("3");
+        setErrorMessages({ name: "err_amount", message: submit_errors.amount });
+    }
+    if (Name === '')
+    {
+      // console.log("2");
+      setErrorMessages({ name: "err_name", message: submit_errors.groupname });
+    }
+    // console.log(document.forms[0]);
+    // console.log(paid.value);
+
+    // console.log(errorMessages);
     const addData = async() =>{
-
+      console.log("ADD");
       const transactionIDs = [];
       const userIDs = [currentUser._id];
       const createTransactionURL = 'http://localhost:5050/record/transaction/create';
 
+      console.log("submitdata", submitData);
+      console.log("keys: ", Object.keys(submitData));
       for (const borrowerName of Object.keys(submitData)){
-
+        console.log("RUNNN")
         // Fetch borrower document
 
         let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
@@ -171,10 +234,18 @@ export default function NewGroup() {
           throw new Error("Borrower id not found!");
 
         borrower = await borrower.json();
-
-
+        console.log("R", submitData[borrowerName]);
+        if (submitData[borrowerName] === '')
+        {
+          setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+          break;
+        }
+        else if (parseFloat(submitData[borrowerName]) <= 0.00)
+        {
+          setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+          break;
+        }
         // Create transaction
-
         let newTransaction = {
           name:  Name,
           loaner: currentUser._id,
@@ -280,7 +351,8 @@ export default function NewGroup() {
       let updatedUser = await fetch(`http://localhost:5050/record/user/${currentUser._id}`);
       updatedUser = await updatedUser.json();
       localStorage.setItem("currentuser", JSON.stringify(updatedUser));
-      setIsSubmitted(true);
+      if (errorMessages.length <= 0)
+      {setIsSubmitted(true);}
     }
 
     addData();
@@ -293,15 +365,20 @@ export default function NewGroup() {
         <div className="input-container">
           <label>Group Name </label>
           <input type="text" onChange={modifyName} name="groupname" required />
+          {renderErrorMessage("err_name")}
         </div>
         <div className="input-container">
-          <label>You paid </label>
-          <input type="number" onChange={modifyAmount} name="paid" required />
+          <label>You paid ($): </label>
+          {/* <input type="number" onChange={modifyAmount} name="paid" required /> */}
+          <CurrencyInput name="paid"
+          allowNegativeValue={false}  disableAbbreviations={true} disableGroupSeparators={true} required/>
+          {renderErrorMessage("err_amount")}
         </div>
         <DropdownMenu
           selectedFriends={selectedFriends}
           handleFriendSelection={handleFriendSelection}
           setData = {addData}
+          errorMessages={errorMessages}
         />
         <div className="button-container">
           <input type="submit" value="Submit" onClick={handleSubmit} />
