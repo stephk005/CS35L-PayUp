@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Login.css";
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,16 @@ export default function Login() {
     uname: "Invalid username",
     pass: "Invalid password"
   };
+
+
+  useEffect(() => {
+    if(localStorage.getItem("currentuser")){
+      console.log("Login found user in local storage!");
+      window.alert("Cannot access Login if you've signed in");
+      navigate("/Home", {replace: true});
+    }
+  }, []);
+
 
   const handleSubmit = async (event) => {
     //Prevent page reload

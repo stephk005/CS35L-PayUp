@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Login.css";
 import "./Signup.css"
 import Header from "./Header";
@@ -13,6 +13,16 @@ export default function Signup() {
     uname: "Username already in use. ",
     invalid_email: "Enter a valid email."
   };
+
+
+  useEffect(() => {
+    if(localStorage.getItem("currentuser")){
+      console.log("Signup found user in local storage!");
+      window.alert("Cannot access Signup if you've signed in");
+      navigate("/Home", {replace: true});
+    }
+  }, []);
+  
 
   const handleSubmit = async (event) => {
 
