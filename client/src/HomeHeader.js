@@ -10,9 +10,10 @@ export default function HomeHeader() {
 
         let user = JSON.parse(localStorage.getItem('currentuser'));
         let transactionIDs = user.transactions;
-
-        loadPayLists();
+        
         let net = 0;
+        loadPayLists();
+        
 
         async function loadPayLists(){
         for(let transactionID of transactionIDs){
