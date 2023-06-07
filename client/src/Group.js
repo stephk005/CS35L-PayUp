@@ -153,10 +153,10 @@ export default function Group() {
     <HomeHeader/>
     <div className="groupscreen">
       <div className="group">
-        {renderTransactions}
-        <a href="http://localhost:3000/Group/New">
+      <a href="http://localhost:3000/Group/New">
           <button className="new-group-button">New Group</button>
         </a>
+        {renderTransactions}
       </div>
     </div>
   </div>

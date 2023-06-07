@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./NewGroup.css";
 import HomeHeader from "./HomeHeader";
 import CurrencyInput from 'react-currency-input-field';
+import { useNavigate } from "react-router-dom";
 
 
   
@@ -15,7 +16,7 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
 
   // const [errorMessages, setErrorMessages] = useState({});
 
-  console.log("ERROR MESSAGES: ", errorMessages.message);
+  // console.log("ERROR MESSAGES: ", errorMessages.message);
   
   const friend_errors = {
     amount: "Must enter an amount",
@@ -141,6 +142,7 @@ export default function NewGroup() {
   const [Amount, setAmount] = useState(0)
   const [Name, setName] = useState("")
   const [errorMessages, setErrorMessages] = useState({});
+  const navigate = useNavigate();
 
   const submit_errors = {
     groupname: "Must enter group name",
@@ -171,7 +173,7 @@ export default function NewGroup() {
 
 
   const modifyAmount = (temp) =>{
-    console.log("amt called");
+    // console.log("amt called");
     setAmount(temp.target.value)
   }
   const modifyName = (temp) =>{
@@ -194,8 +196,29 @@ export default function NewGroup() {
     // console.log("friends: ", friends);
     // console.log("pay: ", pay);
     let error = 0
-    console.log("length: ", selectedFriends.length);
+    // console.log("length: ", selectedFriends.length);
 
+    if (Object.keys(submitData).length === 0)
+    {
+      error = 6
+      setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+    }
+    for (const borrowerName of Object.keys(submitData)){
+      // console.log("JSFNJSE", submitData[borrowerName]);
+      if (submitData[borrowerName] === '' || submitData[borrowerName] === null || submitData[borrowerName] == null)
+      {
+        error = 4
+        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+        break;
+      }
+      else if (parseFloat(submitData[borrowerName]) <= 0.00)
+      {
+        error = 5
+        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+        break;
+      }
+
+    }
 
     if (Name === '')
     {
@@ -206,12 +229,12 @@ export default function NewGroup() {
     else if (paid.value <= 0 || paid.value === '')
     {
       error = 2
-      console.log("3");
+      // console.log("3");
         setErrorMessages({ name: "err_amount", message: submit_errors.amount });
     }
     else if (selectedFriends.length == 0 )
     {
-      console.log("4");
+      // console.log("4");
       error = 3
       setErrorMessages({ name: "err_friend", message: submit_errors.friend });
     }
@@ -228,36 +251,21 @@ export default function NewGroup() {
     // console.log(paid.value);
 
     // console.log(errorMessages);
-    console.log("ADD");
+    // console.log("ADD");
     const transactionIDs = [];
     const userIDs = [currentUser._id];
     const createTransactionURL = 'http://localhost:5050/record/transaction/create';
 
-    console.log("submitdata", submitData);
-    console.log("keys: ", Object.keys(submitData));
+    // console.log("submitdata", submitData);
+    // console.log("keys: ", Object.keys(submitData));
 
-    for (const borrowerName of Object.keys(submitData)){
-      if (submitData[borrowerName] === '' || submitData[borrowerName] == null)
-      {
-        error = 4
-
-        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
-        break;
-      }
-      else if (parseFloat(submitData[borrowerName]) <= 0.00)
-      {
-        error = 5
-        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
-        break;
-      }
-
-    }
+    
     if(error !== 0){
       return
     }
 
     for (const borrowerName of Object.keys(submitData)){
-      console.log("RUNNN")
+      // console.log("RUNNN")
       // Fetch borrower document
 
       let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
@@ -267,7 +275,7 @@ export default function NewGroup() {
         throw new Error("Borrower id not found!");
 
       borrower = await borrower.json();
-      console.log("R", submitData[borrowerName]);
+      // console.log("R", submitData[borrowerName]);
       
       // Create transaction
       let newTransaction = {
@@ -413,7 +421,7 @@ export default function NewGroup() {
       <HomeHeader/>
       <div className="newgroup">
         <div className="newgroup-form">
-          {isSubmitted ? <div>Group successfully created</div> : renderForm}
+          {isSubmitted ? navigate("/Group") : renderForm}
         </div>
       </div>
     </div>);
