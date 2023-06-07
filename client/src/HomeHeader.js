@@ -4,40 +4,43 @@ import { Link } from "react-router-dom";
 
 
 export default function HomeHeader() {
-    const [balance, setBalance] = useState();
+    const [lended, setLended] = useState(0);
+    const [borrowed, setBorrowed] = useState(0);
 
     useEffect(() => {
 
         let user = JSON.parse(localStorage.getItem('currentuser'));
         let transactionIDs = user.transactions;
         
-        let net = 0;
+        let lended = 0;
+        let borrowed = 0;
         loadPayLists();
         
 
         async function loadPayLists(){
-        for(let transactionID of transactionIDs){
-            let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
+            for(let transactionID of transactionIDs){
+                let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
 
-            let res = await fetch(transactionURL);
+                let res = await fetch(transactionURL);
 
-            if(res.status !== 200)
-                throw new Error("Invalid transaction ID in user!");   
-            let transaction = await res.json();
-            
-            if(!transaction.isPaid){
-                if(transaction.loaner === user._id){
-                    net += transaction.amount;
-                } else if(transaction.borrower === user._id) {
-                    net -= transaction.amount;
-                } else {
-                    throw new Error("Error calculating balance!");
+                if(res.status !== 200)
+                    throw new Error("Invalid transaction ID in user!");   
+                let transaction = await res.json();
+                
+                if(!transaction.isPaid){
+                    if(transaction.loaner === user._id){
+                        lended += transaction.amount;
+                    } else if(transaction.borrower === user._id) {
+                        borrowed += transaction.amount;
+                    } else {
+                        throw new Error("Error calculating balance!");
+                    }
                 }
             }
+            setLended(lended);
+            setBorrowed(borrowed);
         }
-        setBalance(net);
-
-}}, []);
+    }, []);
 
     // const handleClick = async (event) => {
         // event.preventDefault();
@@ -68,17 +71,20 @@ export default function HomeHeader() {
     return (
         <div className="homeheader">
             <div className="homeheader_welcome">
-            <Link className = "homeheader_link" to="/Home">Home</Link>
+                <Link className = "homeheader_link" to="/Home">Home</Link>
             </div>
             <div className="homeheader_balance">
-            {/* <Link className = "homeheader_link" to="/FriendProfile" onClick={() => handleClick()} >Balance</Link> */}
-            <label>Balance: ${balance}</label>
+                {/* <Link className = "homeheader_link" to="/FriendProfile" onClick={() => handleClick()} >Balance</Link> */}
+                <label>Amount Lended: ${lended}</label>
+            </div>
+            <div className="homeheader_balance">
+                <label>Amount Borrowed: ${borrowed}</label>
             </div>
             <div className="homeheader_tempgroup_link">
-            <Link className = "homeheader_link" to="/Group">Group</Link>
+                <Link className = "homeheader_link" to="/Group">Group</Link>
             </div>
             <div className="homeheader_profile_link">
-            <Link className = "homeheader_link" to="/Profile">Profile</Link>
+                <Link className = "homeheader_link" to="/Profile">Profile</Link>
             </div>
         </div>
           

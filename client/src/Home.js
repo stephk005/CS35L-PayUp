@@ -174,7 +174,7 @@ export default function Home(){
                         ${transaction.amount}
                     </label>
                 </div>
-                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
                 <button onClick={function(){
                     setAsPaid(transaction.id)
                 }}> Set As Paid</button>
@@ -210,7 +210,7 @@ export default function Home(){
                         ${transaction.amount}
                     </label>
                 </div>
-                <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
+                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
             </button>);
         });
 
