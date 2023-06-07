@@ -195,13 +195,13 @@ export default function NewGroup() {
     // console.log("pay: ", pay);
     let error = 0
     console.log("length: ", selectedFriends.length);
-    if (selectedFriends.length == 0)
+    if (selectedFriends.length == 0 )
     {
       console.log("4");
       error = 1
       setErrorMessages({ name: "err_friend", message: submit_errors.friend });
     }
-    if (paid.value <= 0 || paid.value === '')
+    if (paid.value <= 0 || paid.value === '' || Object.keys(submitData).length === 0)
     {
       error = 2
       console.log("3");
@@ -213,6 +213,7 @@ export default function NewGroup() {
       // console.log("2");
       setErrorMessages({ name: "err_name", message: submit_errors.groupname });
     }
+
     // console.log(document.forms[0]);
     // console.log(paid.value);
 
@@ -224,18 +225,8 @@ export default function NewGroup() {
 
     console.log("submitdata", submitData);
     console.log("keys: ", Object.keys(submitData));
+
     for (const borrowerName of Object.keys(submitData)){
-      console.log("RUNNN")
-      // Fetch borrower document
-
-      let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
-      let borrower = await fetch(borrowerURL);
-
-      if(borrower.status !== 200)
-        throw new Error("Borrower id not found!");
-
-      borrower = await borrower.json();
-      console.log("R", submitData[borrowerName]);
       if (submitData[borrowerName] === '' || submitData[borrowerName] == null)
       {
         error = 4
@@ -248,6 +239,25 @@ export default function NewGroup() {
         setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
         break;
       }
+
+    }
+    if(error !== 0){
+      return
+    }
+
+    for (const borrowerName of Object.keys(submitData)){
+      console.log("RUNNN")
+      // Fetch borrower document
+
+      let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
+      let borrower = await fetch(borrowerURL);
+
+      if(borrower.status !== 200)
+        throw new Error("Borrower id not found!");
+
+      borrower = await borrower.json();
+      console.log("R", submitData[borrowerName]);
+      
       // Create transaction
       let newTransaction = {
         name:  Name,
