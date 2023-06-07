@@ -73,13 +73,15 @@ export default function Home(){
                 
 
                 if(!transaction.isPaid){
+
                     loaner = await loaner.json();
                     borrower = await borrower.json();
 
                     let entry = {
                         user: null, // This is the user you borrowed/lent money from/to
                         amount: transaction.amount,
-                        id: transaction._id
+                        id: transaction._id,
+                        name: transaction.name
                     };
 
                     if(loaner.username === user.username){
@@ -95,6 +97,9 @@ export default function Home(){
             }
             toPayList.current = tempToPayList;
             toBePaidList.current = tempToBePaidList;
+
+            console.log(tempToPayList);
+            console.log(toPayList.current);
 
             if(isFetching1.current && !isFetching2.current)
                 setRerender(!rerender);
@@ -151,12 +156,24 @@ export default function Home(){
         toPayElement = toPayList.current.map((transaction) => {
             return (
             <button className="PayLi">
-                <label className="Friend_Name">
-                    {transaction.user}
-                </label>
-                <label className="Amount">
-                    Amount: ${transaction.amount}
-                </label>
+                <div className="TextGroup">
+                    <label className="LabelName">Group:</label>
+                    <label className="Group_Name">
+                        {transaction.name}
+                    </label>
+                </div>
+                <div className="TextGroup">
+                    <label className="LabelName">Friend:</label>
+                    <label className="Friend_Name">
+                        {transaction.user}
+                    </label>
+                </div>
+                <div className="TextGroup">
+                    <label className="LabelName">Amount:</label>
+                    <label className="Amount">
+                        ${transaction.amount}
+                    </label>
+                </div>
                 <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
                 <button onClick={function(){
                     setAsPaid(transaction.id)
@@ -175,12 +192,24 @@ export default function Home(){
         toBePaidElement = toBePaidList.current.map((transaction) => {
             return (
             <button className="PayLi">
-                <label className="Friend_Name">
-                    {transaction.user}
-                </label>
-                <label className="Amount">
-                    Amount: ${transaction.amount}
-                </label>
+                <div className="TextGroup">
+                    <label className="LabelName">Group:</label>
+                    <label className="Group_Name">
+                        {transaction.name}
+                    </label>
+                </div>
+                <div className="TextGroup">
+                    <label className="LabelName">Friend:</label>
+                    <label className="Friend_Name">
+                        {transaction.user}
+                    </label>
+                </div>
+                <div className="TextGroup">
+                    <label className="LabelName">Amount:</label>
+                    <label className="Amount">
+                        ${transaction.amount}
+                    </label>
+                </div>
                 <Link className= "To_Friend" to = "/Profile"> to Profile</Link>
             </button>);
         });

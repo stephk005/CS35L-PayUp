@@ -10,72 +10,128 @@
     flex: 1;
     display: flex;
     overflow: hidden;
+    justify-content: space-evenly;
+    background-color: #a597ec;
     margin-top: 20px;
     margin-bottom: 20px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Tahoma', 'Verdana', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: x-large;
   }
   
-  .ToPayScreen,
-  .ToBePaidScreen {
-    flex: 1;
-    padding: 10px;
+  .ToPayScreen {
+    flex: 0.9;
     background-color: white;
-    margin-left: 20px;
-    margin-right: 20px;
+    flex-direction: column;
+    padding: 10px;
+    margin-left: 16px;
+    margin-right: 8px;
+    border-radius: 10px;
+  }
+
+  .ToBePaidScreen {
+    flex: 0.9;
+    background-color: white;
+    flex-direction: column;
+    padding: 10px;
+    margin-left: 8px;
+    margin-right: 8px;
+    border-radius: 10px;
   }
   
   .FriendsGroupsScreen {
-    flex: 0.3; /* Adjust the flex value to make it thinner */
-    padding: 10px;
-    margin-right: 20px;
+    flex: 0.5; /* Adjust the flex value to make it thinner */
     background-color: white;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align friends list to the left */
-  }
-  
-  .payList,
-  .friendsList {
-    height: calc(100% - 20px);
-    width: 80%;
-    overflow: hidden;
-    border: none;
-    background-color: transparent;
+    align-items: center;
+    padding: 10px;
+    margin-left: 8px;
+    margin-right: 16px;
+    border-radius: 10px;
   }
   
   .ListContent,
   .FriendsListContent {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align friends list to the left */
-    max-height: 97.5%;
+    align-items: center;
+    max-height: 100%;
+    width: 94%;
     overflow: hidden;
+    margin-inline: auto;
+  }
+
+  .payList,
+  .friendsList {
+    height: calc(100% - 20px);
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: transparent;
+    padding: 0px;
   }
   
   .PayLi,
   .FriendLi {
-    height: 10vh;
+    height: 70px;
     width: 100%;
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: rgb(255, 220, 206);
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 2px solid rgb(255, 130, 130);
   }
-  
-  .Friend_Name,
-  .Friend,
-  .Amount {
-    height: 100%;
+
+  .TextGroup {
+    height: 90%;
+    margin-inline:5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .LabelName {
+    height: 10px;
     width: 100%;
     display: flex;
     align-items: center;
     padding: 5px;
-  }
-  
-  .Friend_Name,
-  .Friend,
-  .Amount {
     outline: none;
     border: none;
-    background-color: transparent;
+    background-color: rgb(255, 130, 130);
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  
+  .Group_Name,
+  .Friend_Name,
+  .Amount {
+    height: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    outline: none;
+    border: none;
+  }
+
+  .Friend{
+    height: 10px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    outline: none;
+    border: none;
+    font-weight: 600;
+  }
+
+  .To_Friend {
+    margin-inline: 5%;
   }
   
   .searchfriend {
@@ -85,7 +141,6 @@
     padding-top: 1rem;
     padding-left: 0.5rem;
     margin-top: auto; /* Pushes the search bar to the bottom */
-    margin-bottom: 1rem; /* Adds some spacing between the search bar and the friends list */
   }
   
   input[type="text"],
@@ -107,13 +162,13 @@
   }
   
   .error {
-    color: red;
+    color: rgb(255, 130, 130);
     font-size: 12px;
     padding-left: 1rem;
   }
   
   .success {
-    color: #01d28e;
+    color: #6dffce;
     font-size: 12px;
     padding-left: 1rem;
   }
