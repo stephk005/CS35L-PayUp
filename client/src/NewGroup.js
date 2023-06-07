@@ -28,11 +28,10 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
       <div className="error">{errorMessages.message}</div>
     );
     
-  const handleAmountChange = (event, friendName) => {
-    const newAmounts = { ...amounts, [friendName]: event.target.value };
+  const setAmountsDictionary = (amount,friend) =>{
+    const newAmounts = { ...amounts, [friend]: amount};
     setAmounts(newAmounts);
-  };
-
+  }
   const handleDropdownToggle = () => {
     dropdownRef.current.classList.toggle("is-active");
   };
@@ -123,7 +122,7 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
             {selectedFriends.map((friend) => (
               <div key={friend}>
                 {/* {friend}: <input type="number" value={amounts[friend]} onChange={(event) => handleAmountChange(event, friend)} /> */}
-                {friend} will pay ($): <CurrencyInput name="pay" value={amounts[friend]} allowNegativeValue={false}  disableAbbreviations={true} disableGroupSeparators={true} required/>
+                {friend} will pay ($): <CurrencyInput name="pay" onValueChange={(theAmount,theName)=>{setAmountsDictionary(theAmount,friend)}} value={amounts[friend]} allowNegativeValue={false}  disableAbbreviations={true} disableGroupSeparators={true} required/>
                 {renderErrorMessage("err_friendamount")}
               </div>
             ))}
@@ -157,7 +156,7 @@ export default function NewGroup() {
 
   let [submitData, setSubmitData] = useState({})
 
-  const addData = (data) =>{
+  const addSubmitData = (data) =>{
     setSubmitData(data)
   }
 
@@ -194,20 +193,23 @@ export default function NewGroup() {
     // console.log("paid: ", paid);
     // console.log("friends: ", friends);
     // console.log("pay: ", pay);
-
+    let error = 0
     console.log("length: ", selectedFriends.length);
     if (selectedFriends.length == 0)
     {
       console.log("4");
+      error = 1
       setErrorMessages({ name: "err_friend", message: submit_errors.friend });
     }
     if (paid.value <= 0 || paid.value === '')
     {
+      error = 2
       console.log("3");
         setErrorMessages({ name: "err_amount", message: submit_errors.amount });
     }
     if (Name === '')
     {
+      error=3
       // console.log("2");
       setErrorMessages({ name: "err_name", message: submit_errors.groupname });
     }
@@ -215,147 +217,145 @@ export default function NewGroup() {
     // console.log(paid.value);
 
     // console.log(errorMessages);
-    const addData = async() =>{
-      console.log("ADD");
-      const transactionIDs = [];
-      const userIDs = [currentUser._id];
-      const createTransactionURL = 'http://localhost:5050/record/transaction/create';
+    console.log("ADD");
+    const transactionIDs = [];
+    const userIDs = [currentUser._id];
+    const createTransactionURL = 'http://localhost:5050/record/transaction/create';
 
-      console.log("submitdata", submitData);
-      console.log("keys: ", Object.keys(submitData));
-      for (const borrowerName of Object.keys(submitData)){
-        console.log("RUNNN")
-        // Fetch borrower document
+    console.log("submitdata", submitData);
+    console.log("keys: ", Object.keys(submitData));
+    for (const borrowerName of Object.keys(submitData)){
+      console.log("RUNNN")
+      // Fetch borrower document
 
-        let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
-        let borrower = await fetch(borrowerURL);
+      let borrowerURL = `http://localhost:5050/record/user/username/${borrowerName}`;
+      let borrower = await fetch(borrowerURL);
 
-        if(borrower.status !== 200)
-          throw new Error("Borrower id not found!");
+      if(borrower.status !== 200)
+        throw new Error("Borrower id not found!");
 
-        borrower = await borrower.json();
-        console.log("R", submitData[borrowerName]);
-        if (submitData[borrowerName] === '')
-        {
-          setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
-          break;
-        }
-        else if (parseFloat(submitData[borrowerName]) <= 0.00)
-        {
-          setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
-          break;
-        }
-        // Create transaction
-        let newTransaction = {
-          name:  Name,
-          loaner: currentUser._id,
-          borrower: borrower._id,
-          amount: parseFloat(submitData[borrowerName])
-        };
-
-        let transactionRes = await fetch(createTransactionURL, {
-          method: "POST",
-          headers: {
-              'Content-Type': 'application/json'   // This needs to be included for proper parsing
-          },
-          body: JSON.stringify(newTransaction)
-        });
-
-
-        if (transactionRes.status !== 201)
-          throw new Error("Couldn't create transaction!");
-        
-        
-        let transactionID = await transactionRes.json();  
-        transactionIDs.push(transactionID);
-        userIDs.push(borrower._id);
-
-
-        // Insert the transaction into the borrower document
-
-        let insertURL1 = `http://localhost:5050/record/user/insert/transaction/${borrower._id}`;
-
-        let insertRes1 = await fetch(insertURL1, {
-          method: "PATCH",
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({id: transactionID})
-        });
-
-        if(insertRes1.status !== 201)
-          throw new Error("Couldn't add transaction to user!");
-
-        
-        // Insert the transaction into the current user document
-        
-        let insertURL2 = `http://localhost:5050/record/user/insert/transaction/${currentUser._id}`;
-
-        let insertRes2 = await fetch(insertURL2, {
-          method: "PATCH",
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({id: transactionID})
-        });
-
-        if(insertRes2.status !== 201)
-          throw new Error("Couldn't add transaction to user!");
+      borrower = await borrower.json();
+      console.log("R", submitData[borrowerName]);
+      if (submitData[borrowerName] === '' || submitData[borrowerName] == null)
+      {
+        error = 4
+        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+        break;
       }
-
-
-      // Create group with transactions
-
-      const createGroupURL = "http://localhost:5050/record/group/create";
-
-      let newGroup = {
-        name: Name,
-        members: userIDs,
-        transactions: transactionIDs
+      else if (parseFloat(submitData[borrowerName]) <= 0.00)
+      {
+        error = 5
+        setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
+        break;
+      }
+      // Create transaction
+      let newTransaction = {
+        name:  Name,
+        loaner: currentUser._id,
+        borrower: borrower._id,
+        amount: parseFloat(submitData[borrowerName])
       };
 
-      let result = await fetch(createGroupURL, {
+      let transactionRes = await fetch(createTransactionURL, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'   // This needs to be included for proper parsing
         },
-        body: JSON.stringify(newGroup)
+        body: JSON.stringify(newTransaction)
       });
 
 
-      if (result.status !== 201) 
-        throw new Error("Couldn't create group!");
+      if (transactionRes.status !== 201)
+        throw new Error("Couldn't create transaction!");
       
-      let groupID = await result.json();  // Converts to proper JS Object
+      
+      let transactionID = await transactionRes.json();  
+      transactionIDs.push(transactionID);
+      userIDs.push(borrower._id);
 
 
-      // Add group to all member user documents
-      for(let userID of userIDs){
-        let insertURL = `http://localhost:5050/record/user/insert/group/${userID}`;
+      // Insert the transaction into the borrower document
 
-        let insertRes = await fetch(insertURL, {
-          method: "PATCH",
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({id: groupID})
-        });
+      let insertURL1 = `http://localhost:5050/record/user/insert/transaction/${borrower._id}`;
 
-        if(insertRes.status !== 201)
-          throw new Error("Couldn't add group to user!");
-      }
+      let insertRes1 = await fetch(insertURL1, {
+        method: "PATCH",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: transactionID})
+      });
 
+      if(insertRes1.status !== 201)
+        throw new Error("Couldn't add transaction to user!");
 
-      // Store the updated user in local storage
+      
+      // Insert the transaction into the current user document
+      
+      let insertURL2 = `http://localhost:5050/record/user/insert/transaction/${currentUser._id}`;
 
-      let updatedUser = await fetch(`http://localhost:5050/record/user/${currentUser._id}`);
-      updatedUser = await updatedUser.json();
-      localStorage.setItem("currentuser", JSON.stringify(updatedUser));
-      if (errorMessages.length <= 0)
-      {setIsSubmitted(true);}
+      let insertRes2 = await fetch(insertURL2, {
+        method: "PATCH",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: transactionID})
+      });
+
+      if(insertRes2.status !== 201)
+        throw new Error("Couldn't add transaction to user!");
     }
 
-    addData();
+
+    // Create group with transactions
+
+    const createGroupURL = "http://localhost:5050/record/group/create";
+
+    let newGroup = {
+      name: Name,
+      members: userIDs,
+      transactions: transactionIDs
+    };
+
+    let result = await fetch(createGroupURL, {
+      method: "POST",
+      headers: {
+          'Content-Type': 'application/json'   // This needs to be included for proper parsing
+      },
+      body: JSON.stringify(newGroup)
+    });
+
+
+    if (result.status !== 201) 
+      throw new Error("Couldn't create group!");
+    
+    let groupID = await result.json();  // Converts to proper JS Object
+
+
+    // Add group to all member user documents
+    for(let userID of userIDs){
+      let insertURL = `http://localhost:5050/record/user/insert/group/${userID}`;
+
+      let insertRes = await fetch(insertURL, {
+        method: "PATCH",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: groupID})
+      });
+
+      if(insertRes.status !== 201)
+        throw new Error("Couldn't add group to user!");
+    }
+
+
+    // Store the updated user in local storage
+
+    let updatedUser = await fetch(`http://localhost:5050/record/user/${currentUser._id}`);
+    updatedUser = await updatedUser.json();
+    localStorage.setItem("currentuser", JSON.stringify(updatedUser));
+    if (error === 0)
+    {setIsSubmitted(true);}
   }
 
 
@@ -377,7 +377,7 @@ export default function NewGroup() {
         <DropdownMenu
           selectedFriends={selectedFriends}
           handleFriendSelection={handleFriendSelection}
-          setData = {addData}
+          setData = {addSubmitData}
           errorMessages={errorMessages}
         />
         <div className="button-container">
