@@ -185,7 +185,7 @@ export default function NewGroup() {
     let currentUser = JSON.parse(localStorage.getItem("currentuser"));
     // console.log("Submit data:", submitData);
     // console.log("name=", Name, ".")
-    // console.log("l: ", selectedFriends.length)
+    //console.log("l: ", selectedFriends.length)
     // console.log("FEASFD", document.forms[0]);
     var { groupname, paid, friends, pay} = document.forms[0];
     // console.log("HELLO", document.forms[0].elements);
@@ -195,24 +195,34 @@ export default function NewGroup() {
     // console.log("pay: ", pay);
     let error = 0
     console.log("length: ", selectedFriends.length);
-    if (selectedFriends.length == 0 )
+
+
+    if (Name === '')
     {
-      console.log("4");
-      error = 1
-      setErrorMessages({ name: "err_friend", message: submit_errors.friend });
+      error=1
+      // console.log("2");
+      setErrorMessages({ name: "err_name", message: submit_errors.groupname });
     }
-    if (paid.value <= 0 || paid.value === '' || Object.keys(submitData).length === 0)
+    else if (paid.value <= 0 || paid.value === '')
     {
       error = 2
       console.log("3");
         setErrorMessages({ name: "err_amount", message: submit_errors.amount });
     }
-    if (Name === '')
+    else if (selectedFriends.length == 0 )
     {
-      error=3
-      // console.log("2");
-      setErrorMessages({ name: "err_name", message: submit_errors.groupname });
+      console.log("4");
+      error = 3
+      setErrorMessages({ name: "err_friend", message: submit_errors.friend });
     }
+    else if(Object.keys(submitData).length === 0 && selectedFriends.length !== 0)
+    {
+      for (const temp of selectedFriends){
+        submitData[temp] = null
+      }
+    }
+
+    
 
     // console.log(document.forms[0]);
     // console.log(paid.value);
@@ -230,6 +240,7 @@ export default function NewGroup() {
       if (submitData[borrowerName] === '' || submitData[borrowerName] == null)
       {
         error = 4
+
         setErrorMessages({ name: "err_friendamount", message: submit_errors.amount });
         break;
       }
