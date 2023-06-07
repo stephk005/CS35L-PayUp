@@ -391,7 +391,8 @@ router.post("/transaction/create", async (req, res) => {
     loaner: req.body.loaner,  // _id
     borrower: req.body.borrower,  // _id
     amount: req.body.amount,  // double
-    isPaid: false
+    isPaid: false,
+    totalAmountPaid: req.body.totalAmountPaid
   };
 
   if(Object.values(newTransaction).includes(undefined)){

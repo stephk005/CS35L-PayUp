@@ -68,7 +68,7 @@ export default function Group() {
           if(!entry.loanerName){
 
             entry.loanerName = loaner.username;
-            entry.loanAmount = transaction.amount;
+            entry.loanAmount = transaction.totalAmountPaid
             
             // Add first borrower + amount borrowed
             entry.borrowerNames = [borrower.username];
@@ -77,7 +77,7 @@ export default function Group() {
 
           } else { // Add more money to the amount loaned
 
-            entry.loanAmount += transaction.amount;
+            entry.loanAmount += transaction.totalAmountPaid
 
             // Add another borrower + amount borrowed
             entry.borrowerNames.push(borrower.username);

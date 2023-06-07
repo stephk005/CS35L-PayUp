@@ -282,7 +282,8 @@ export default function NewGroup() {
         name:  Name,
         loaner: currentUser._id,
         borrower: borrower._id,
-        amount: parseFloat(submitData[borrowerName])
+        amount: parseFloat(submitData[borrowerName]),
+        totalAmountPaid: parseFloat(paid.value)
       };
 
       let transactionRes = await fetch(createTransactionURL, {
