@@ -186,7 +186,7 @@ router.patch("/user/insert/transaction/:id", async (req, res) => {
 
 // Allows removal of friend (should pass user ID)
 router.patch("/user/pop/friend/:id", async (req, res) => {
-
+  // console.log("CALLED REMOVE FRIEND");
   let friendID = req.body.id;
 
   let collection = await db.collection("users");
@@ -194,8 +194,29 @@ router.patch("/user/pop/friend/:id", async (req, res) => {
   let arrayAction = {$pull: {friends: friendID}};
   let result = await collection.updateOne(query, arrayAction);
 
+  if (!result) res.status(500).send("POP_ERROR");
+  let transactionsCollection = await db.collection("transactions");
+  let transactionsquery = {
+    $or: [
+      { loaner: friendID },
+      { borrower: friendID }
+    ]
+  };
+
+  let transaction_objects = await transactionsCollection.find(transactionsquery).toArray();
+
+  // console.log("results: ", results);
+  for (let trans_object of transaction_objects)
+  {
+    let transid = trans_object._id.toString();
+    // console.log("RESULT ID", trans_object._id);
+    let userArrayAction = {$pull: {transactions: transid}};
+    let transresult = await collection.updateOne(query, userArrayAction);
+    if (!transresult) res.status(500).send("REMOVE_TRANSACTION_ERROR");
+  }
+
   if(result) res.status(201).send("SUCCESS");
-  else res.status(500).send("POP_ERROR");  // Insertion failed for other reason
+  // else res.status(500).send("REMOVE_TRANSACTION_ERROR");  // Insertion failed for other reason
 });
 
 
@@ -411,7 +432,6 @@ router.post("/transaction/create", async (req, res) => {
 //Set a transaction to be Paid
 router.patch("/transaction/setAsPaid/:id",async(req,res) =>{
   let set = req.body.set;
-  console.log("set: "+set)
   let collection = await db.collection("transactions");
   let query = {_id: new ObjectId(req.params.id)}
   let action = {$set: {isPaid: set}}
