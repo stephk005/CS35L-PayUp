@@ -32,17 +32,20 @@ export default function Home(){
             console.log( await result.json())
             throw new Error("Couldn't create transaction!");
         }
-
+        else
+            {
+                console.log("EHFIEHIOF");
+                window.location.reload();
+            }
 
     }
 
-
+    
     useEffect(() => {
 
         let user = JSON.parse(localStorage.getItem('currentuser'));
         let transactionIDs = user.transactions;
         let friendIDs = user.friends;
-
         loadPayLists();
         loadFriendList();
 
@@ -174,7 +177,7 @@ export default function Home(){
                         ${transaction.amount}
                     </label>
                 </div>
-                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
+                <Link className= "To_Friend" onClick={()=>{setFriendProfileID(transaction.user)}} to = "/FriendProfile"> View Profile</Link>
                 <button onClick={function(){
                     setAsPaid(transaction.id)
                 }}> Set As Paid</button>
@@ -210,7 +213,7 @@ export default function Home(){
                         ${transaction.amount}
                     </label>
                 </div>
-                <Link className= "To_Friend" to = "/Profile"> View Profile</Link>
+                <Link className= "To_Friend" onClick={()=>{setFriendProfileID(transaction.user)}} to = "/FriendProfile"> View Profile</Link>
             </button>);
         });
 
@@ -311,6 +314,7 @@ export default function Home(){
                     console.log("updated user: ", user);
                     localStorage.setItem('currentuser', JSON.stringify(user));
                 } else console.log("Error fetching user");
+                window.location.reload();
             }
         }
     }
