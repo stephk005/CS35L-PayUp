@@ -9,14 +9,14 @@ export default function Home(){
     const [addError, setaddError] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [rerender, setRerender] = useState(true);
+    const [lended, setLended] = useState(0);
+    const [borrowed, setBorrowed] = useState(0);
     let toBePaidList = useRef([]);
     let toPayList = useRef([]);
     let friends = useRef([]);
     let isFetching1 = useRef(true);
     let isFetching2 = useRef(true);
-
-
-
+    
     const setAsPaid = async(id) =>{
 
         console.log("the id: ", id)
@@ -42,12 +42,40 @@ export default function Home(){
 
     
     useEffect(() => {
-
         let user = JSON.parse(localStorage.getItem('currentuser'));
         let transactionIDs = user.transactions;
+        
+        let lended = 0;
+        let borrowed = 0;
+        loadPayLists();
+
+        async function loadPayLists(){
+            for(let transactionID of transactionIDs){
+                let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
+
+                let res = await fetch(transactionURL);
+
+                if(res.status !== 200)
+                    throw new Error("Invalid transaction ID in user!");   
+                let transaction = await res.json();
+                
+                if(!transaction.isPaid){
+                    if(transaction.loaner === user._id){
+                        lended += transaction.amount;
+                    } else if(transaction.borrower === user._id) {
+                        borrowed += transaction.amount;
+                    } else {
+                        throw new Error("Error calculating balance!");
+                    }
+                }
+            }
+            setLended(lended);
+            setBorrowed(borrowed);
+        }
         let friendIDs = user.friends;
         loadPayLists();
         loadFriendList();
+
 
 
         // Load Transaction Lists
@@ -153,7 +181,7 @@ export default function Home(){
         toPayElement = null;
     else if(toPayList.current.length === 0)
         toPayElement = (
-            <h3>Nothing to see here!</h3>
+            <h5>No pending transactions.</h5>
         );
     else
         toPayElement = toPayList.current.map((transaction) => {
@@ -189,7 +217,7 @@ export default function Home(){
         toBePaidElement = null;
     else if(toBePaidList.current.length === 0)
         toBePaidElement = (
-            <h3>Nothing to see here!</h3>
+            <h5>No pending transactions.</h5>
         );
     else
         toBePaidElement = toBePaidList.current.map((transaction) => {
@@ -222,7 +250,7 @@ export default function Home(){
         friendsElement = null;
     else if(friends.current.length === 0)
         friendsElement = (
-            <h3>Nothing to see here!</h3>
+            <h5>No added friends.</h5>
         );
     else
         friendsElement = friends.current.map((friend) => {
@@ -318,21 +346,20 @@ export default function Home(){
             }
         }
     }
-
-
+    
     // Construct the final JSX elements
     return (
         <div className="HomeScreen">
             <HomeHeader/>
             <div className="ListScreens">
                 <div className="ToPayScreen">
-                    <label> Current Transactions To Pay</label>
+                    <label> You owe: ${borrowed}</label>
                     <div className="ListContent">
                         <ul  className="payList">{toPayElement}</ul>
                     </div>
                 </div>
                 <div className="ToBePaidScreen">
-                    <label>Current Transactions To Be Paid</label>
+                    <label>You are owed: ${lended}</label>
                     <div className="ListContent">
                         <ul className="payList">{toBePaidElement}</ul>
                     </div>
