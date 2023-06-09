@@ -74,18 +74,24 @@ export default function FriendProfile() {
             window.alert(message);
         }
         else {
-          let currentUser = JSON.parse(sessionStorage.getItem('currentuser'))
+
+          let currentUser = JSON.parse(sessionStorage.getItem('currentuser'));
+
           const friendUrl = "http://localhost:5050/record/user/username/"+ sessionStorage.getItem('currentfriend')
-          let friendResult = await fetch(friendUrl)
-          let friendID_data = ""
+          let friendResult = await fetch(friendUrl);
+          let friendID_data = "";
+
           if(friendResult.status == 200){
-            let friendData = await friendResult.json()
-            friendID_data = friendData["_id"]
+
+            let friendData = await friendResult.json();
+            friendID_data = friendData["_id"];
+
             const url = `http://localhost:5050/record/user/pop/friend/${currentUser._id}`; // Some user
-            let friendID = ""
-            if(friendID_data !== ""){
+            
+            let friendID = "";
+            if(friendID_data !== "")
               friendID = {id: friendID_data};
-            }
+            
             let result = await fetch(url, {
                 method: "PATCH",
                 headers: {
@@ -93,10 +99,19 @@ export default function FriendProfile() {
                 },
                 body: JSON.stringify(friendID)
             });
-            let friendArray = currentUser.friends
-            friendArray.splice(friendArray.indexOf(friendID_data),1)
-            currentUser["friends"] = friendArray
-            sessionStorage.setItem("currentuser",JSON.stringify(currentUser))
+
+            if(result.status !== 201)
+              throw new Error("Couldn't remove friend!");
+
+            const getUserURL = `http://localhost:5050/record/user/${currentUser._id}`;
+
+            let userRes = await fetch(getUserURL);
+
+            if(userRes.status !== 200)
+              throw new Error("Couldn't fetch updated user");
+
+            currentUser = await userRes.json();
+            sessionStorage.setItem("currentuser", JSON.stringify(currentUser));
             setIsSubmitted(true);
 
             if(result.status !== 201)
