@@ -348,13 +348,13 @@ export default function Home(){
             <HomeHeader/>
             <div className="ListScreens">
                 <div className="ToPayScreen">
-                    <label> You owe: ${borrowed.current}</label>
+                    <label> You owe: ${borrowed.current.toFixed(2)}</label>
                     <div className="ListContent">
                         <ul  className="payList">{toPayElement}</ul>
                     </div>
                 </div>
                 <div className="ToBePaidScreen">
-                    <label>You are owed: ${lended.current}</label>
+                    <label>You are owed: ${lended.current.toFixed(2)}</label>
                     <div className="ListContent">
                         <ul className="payList">{toBePaidElement}</ul>
                     </div>
