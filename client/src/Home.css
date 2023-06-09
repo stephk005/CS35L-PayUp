@@ -23,6 +23,8 @@
     background-color: white;
     flex-direction: column;
     padding: 10px;
+    max-height: 100%;
+    overflow: scroll;
     margin-left: 16px;
     margin-right: 8px;
     border-radius: 10px;
@@ -33,6 +35,8 @@
     background-color: white;
     flex-direction: column;
     padding: 10px;
+    max-height: max-content;
+    overflow: scroll;
     margin-left: 8px;
     margin-right: 8px;
     border-radius: 10px;
@@ -45,6 +49,8 @@
     flex-direction: column;
     align-items: center;
     padding: 10px;
+    max-height: max-content;
+    overflow: scroll;
     margin-left: 8px;
     margin-right: 16px;
     border-radius: 10px;
@@ -55,7 +61,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-height: 100%;
+    max-height:max-content;
     width: 94%;
     overflow: hidden;
     margin-inline: auto;
@@ -66,6 +72,7 @@
     height: calc(100% - 20px);
     width: 100%;
     overflow: hidden;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
