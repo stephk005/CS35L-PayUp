@@ -23,6 +23,9 @@
   .homeheader_tempgroup_link {
     display: flex;
   }
+  .homeheader_newgroup_link {
+    display: flex;
+  }
 
   .homeheader_profile_link {
     display: flex;
