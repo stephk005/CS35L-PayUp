@@ -203,8 +203,12 @@ router.patch("/user/pop/friend/:id", async (req, res) => {
     ]
   };
 
-  let transaction_objects = await transactionsCollection.find(transactionsquery).toArray();
+  let friendarrayAction = {$pull: {friends: req.params.id}};
+  let friendquery = {_id: new ObjectId(req.body.id)};
+  let friendresult = await collection.updateOne(friendquery, friendarrayAction);
+  if (!friendresult) res.status(500).send("POP_ERROR");
 
+  let transaction_objects = await transactionsCollection.find(transactionsquery).toArray();
   // console.log("results: ", results);
   for (let trans_object of transaction_objects)
   {
@@ -213,6 +217,10 @@ router.patch("/user/pop/friend/:id", async (req, res) => {
     let userArrayAction = {$pull: {transactions: transid}};
     let transresult = await collection.updateOne(query, userArrayAction);
     if (!transresult) res.status(500).send("REMOVE_TRANSACTION_ERROR");
+
+    let transfriendresult = await collection.updateOne(friendquery, userArrayAction);
+    if (!transfriendresult) res.status(500).send("REMOVE_TRANSACTION_ERROR");
+
   }
 
   if(result) res.status(201).send("SUCCESS");
