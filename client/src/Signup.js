@@ -16,12 +16,12 @@ export default function Signup() {
 
 
   useEffect(() => {
-    if(localStorage.getItem("currentuser")){
+    if(sessionStorage.getItem("currentuser")){
       console.log("Signup found user in local storage!");
       window.alert("Cannot access Signup if you've signed in");
       navigate("/Home", {replace: true});
     }
-  }, []);
+  }, [navigate]);
   
 
   const handleSubmit = async (event) => {
@@ -94,7 +94,7 @@ export default function Signup() {
         try{
           const useridResp = await fetch(`http://localhost:5050/record/user/${user}`);
           userData = await useridResp.json();
-          localStorage.setItem("currentuser", JSON.stringify(userData));
+          sessionStorage.setItem("currentuser", JSON.stringify(userData));
           setIsValidSignUp(true);
         } catch (e) {
           console.error(e);

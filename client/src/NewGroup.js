@@ -3,8 +3,6 @@ import "./NewGroup.css";
 import HomeHeader from "./HomeHeader";
 import CurrencyInput from 'react-currency-input-field';
 import { useNavigate } from "react-router-dom";
-
-
   
 
 const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMessages}) => {
@@ -13,6 +11,16 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
   const [rerender, setRerender] = useState(true);
   let isFetching = useRef(true);
   let friends = useRef([]);
+  let verified = useRef(true);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if(!sessionStorage.getItem("currentuser")){
+      console.log("New Group (Dropdown Menu) found no user in local storage!");
+      verified.current = false;
+    }
+  }, [navigate]);
 
   // const [errorMessages, setErrorMessages] = useState({});
 
@@ -58,10 +66,15 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
 
   useEffect(() => {
 
-    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
-    let friendIDs = currentUser.friends;
+    let currentUser;
+    let friendIDs;
 
-    loadFriendList();
+    if(verified.current) {
+      currentUser = JSON.parse(sessionStorage.getItem("currentuser"));
+      friendIDs = currentUser.friends;
+
+      loadFriendList();
+    }
 
     async function loadFriendList() {
       
@@ -92,6 +105,9 @@ const DropdownMenu = ({ selectedFriends, handleFriendSelection, setData, errorMe
   }, [rerender]);
   
 
+  if(!verified.current)
+    return null
+  
   return (
 
     <div className="dropdown-container">
@@ -142,7 +158,24 @@ export default function NewGroup() {
   const [Amount, setAmount] = useState(0)
   const [Name, setName] = useState("")
   const [errorMessages, setErrorMessages] = useState({});
+  let [submitData, setSubmitData] = useState({})
+  let verified = useRef(true);
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if(!sessionStorage.getItem("currentuser")){
+      console.log("New Group (New Group) found no user in local storage!");
+      window.alert("Cannot access New Group if not signed in");
+      navigate("/", {replace: true});
+      verified.current = false;
+    }
+  }, [navigate]);
+
+
+  if(!verified.current)
+    return null;
+
 
   const submit_errors = {
     groupname: "Must enter group name",
@@ -156,7 +189,6 @@ export default function NewGroup() {
       <div className="error">{errorMessages.message}</div>
     );
 
-  let [submitData, setSubmitData] = useState({})
 
   const addSubmitData = (data) =>{
     setSubmitData(data)
@@ -184,7 +216,7 @@ export default function NewGroup() {
   const handleSubmit = async (event) => {
     //Prevent page reload
     event.preventDefault();
-    let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+    let currentUser = JSON.parse(sessionStorage.getItem("currentuser"));
     // console.log("Submit data:", submitData);
     // console.log("name=", Name, ".")
     //console.log("l: ", selectedFriends.length)
@@ -383,7 +415,7 @@ export default function NewGroup() {
 
     let updatedUser = await fetch(`http://localhost:5050/record/user/${currentUser._id}`);
     updatedUser = await updatedUser.json();
-    localStorage.setItem("currentuser", JSON.stringify(updatedUser));
+    sessionStorage.setItem("currentuser", JSON.stringify(updatedUser));
     if (error === 0)
     {setIsSubmitted(true);}
   }

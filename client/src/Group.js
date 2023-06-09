@@ -2,20 +2,39 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Group.css";
 import HomeHeader from "./HomeHeader";
 import CurrencyInput from 'react-currency-input-field';
+import { useNavigate } from "react-router-dom";
 
 
 export default function Group() {
   const [rerender, setRerender] = useState(true);
   let groupList = useRef([]);
   let isFetching = useRef(true);
+  let verified = useRef(true);
+  const navigate = useNavigate()
+
+
+  useEffect(() => {
+    if(!sessionStorage.getItem("currentuser")){
+      console.log("Group found no user in local storage!");
+      window.alert("Cannot access View Groups if not signed in");
+      navigate("/", {replace: true});
+      verified.current = false;
+    }
+  }, [navigate]);
 
 
   useEffect(() => {
 
-    let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-    let groupIDs = currentUser.groups;
+    let currentUser;
+    let groupIDs;
+
+    if(verified.current){
+      currentUser = JSON.parse(sessionStorage.getItem('currentuser'));
+      groupIDs = currentUser.groups;
+
+      parseTransactions();
+    }
     
-    parseTransactions();
 
     async function parseTransactions() {
 
@@ -104,7 +123,7 @@ export default function Group() {
 
   let renderTransactions;
   
-  if(isFetching.current)
+  if(isFetching.current || !verified.current)
     renderTransactions = null;  // Don't render anything while loading
   else if(groupList.current.length === 0) 
     renderTransactions = (

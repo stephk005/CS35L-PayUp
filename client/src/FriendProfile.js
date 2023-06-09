@@ -12,11 +12,12 @@ const Display = () =>{
 
   let currentFriend = null
 
+
   const addData = async() =>{
-    if (localStorage.getItem('currentfriend') !== null){
-      currentFriend = localStorage.getItem('currentfriend')
+    if (sessionStorage.getItem('currentfriend') !== null){
+      currentFriend = sessionStorage.getItem('currentfriend')
     }
-    const url = "http://localhost:5050/record/user/username/"+ localStorage.getItem('currentfriend')
+    const url = "http://localhost:5050/record/user/username/"+ sessionStorage.getItem('currentfriend')
     let result = await fetch(url);
 
     if(result.status == 200){
@@ -48,20 +49,33 @@ const Display = () =>{
 
 export default function FriendProfile() {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    let verified = useRef(true);
     const navigate = useNavigate();
-    let currentFriend = null
+
+
+    useEffect(() => {
+      if(!sessionStorage.getItem("currentuser")){
+        console.log("FriendProfile found no user in local storage!");
+        window.alert("Cannot access Friend Profile if not signed in");
+        navigate("/", {replace: true});
+        verified.current = false;
+      }
+    }, [navigate]);
+
+    if(!verified.current)
+      return null;
     
     const handleFriendSubmit = async (event) => {
         //Prevent page reload
         event.preventDefault();
-        if (localStorage.getItem('currentfriend') === null && !isSubmitted) // if user is not saved in localstorage
+        if (sessionStorage.getItem('currentfriend') === null && !isSubmitted) // if user is not saved in sessionStorage
         {
             const message = `An error has occured with remove friend:`;
             window.alert(message);
         }
         else {
-          let currentUser = JSON.parse(localStorage.getItem('currentuser'))
-          const friendUrl = "http://localhost:5050/record/user/username/"+ localStorage.getItem('currentfriend')
+          let currentUser = JSON.parse(sessionStorage.getItem('currentuser'))
+          const friendUrl = "http://localhost:5050/record/user/username/"+ sessionStorage.getItem('currentfriend')
           let friendResult = await fetch(friendUrl)
           let friendID_data = ""
           if(friendResult.status == 200){
@@ -82,7 +96,7 @@ export default function FriendProfile() {
             let friendArray = currentUser.friends
             friendArray.splice(friendArray.indexOf(friendID_data),1)
             currentUser["friends"] = friendArray
-            localStorage.setItem("currentuser",JSON.stringify(currentUser))
+            sessionStorage.setItem("currentuser",JSON.stringify(currentUser))
             setIsSubmitted(true);
 
             if(result.status !== 201)

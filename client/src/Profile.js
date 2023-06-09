@@ -1,6 +1,6 @@
 import HomeHeader from "./HomeHeader";
 import  "./Profile.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
@@ -8,23 +8,39 @@ import { useNavigate } from 'react-router-dom';
 export default function Profile() {
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    let validated = useRef(true);
     const navigate = useNavigate();
 
-    let currentUser = JSON.parse(localStorage.getItem('currentuser'));
+
+    useEffect(() => {
+      if(!sessionStorage.getItem("currentuser")){
+        console.log("Profile found no user in local storage!");
+        window.alert("Cannot access Profile if not signed in");
+        navigate("/", {replace: true});
+        validated.current = false;
+      }
+    }, [navigate]);
+
+
+    let currentUser = JSON.parse(sessionStorage.getItem('currentuser'));
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
 
+
     useEffect(() => {
-      setEmail(currentUser.email);
-      setUsername(currentUser.username);
+      if(validated.current){
+        setEmail(currentUser.email);
+        setUsername(currentUser.username);
+      }
     }, []);
+
 
     const handleSubmit = async (event) => {
         //Prevent page reload
         event.preventDefault();
-        console.log("signout user: ", localStorage.getItem('currentuser'));
+        console.log("signout user: ", sessionStorage.getItem('currentuser'));
 
-        if (localStorage.length <= 0) // if user is not saved in localstorage
+        if (sessionStorage.length <= 0) // if user is not saved in sessionStorage
         {
             const message = `An error has occured with sign out:`;
             window.alert(message);
@@ -32,7 +48,7 @@ export default function Profile() {
         else { // handle sign out
             setEmail("");
             setUsername("");
-            localStorage.clear();
+            sessionStorage.clear();
             setIsSubmitted(true);
         }
 
@@ -62,6 +78,9 @@ export default function Profile() {
         </div>
       );
 
+    if(!validated.current)
+      return null;
+    
     return (
         <div>
             <HomeHeader/>

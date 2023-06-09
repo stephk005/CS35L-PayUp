@@ -2,20 +2,32 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Home.css";
 import HomeHeader from "./HomeHeader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function Home(){
     const [addError, setaddError] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [rerender, setRerender] = useState(true);
-    const [lended, setLended] = useState(0);
-    const [borrowed, setBorrowed] = useState(0);
     let toBePaidList = useRef([]);
     let toPayList = useRef([]);
     let friends = useRef([]);
+    let lended = useRef(0);
+    let borrowed = useRef(0);
     let isFetching1 = useRef(true);
     let isFetching2 = useRef(true);
+    let verified = useRef(true);
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        if(!sessionStorage.getItem("currentuser")){
+          console.log("Home found no user in local storage!");
+          window.alert("Cannot access Home if not signed in");
+          navigate("/", {replace: true});
+          verified.current = false;
+        }
+    }, [navigate]);
     
     const setAsPaid = async(id) =>{
 
@@ -37,52 +49,31 @@ export default function Home(){
                 console.log("EHFIEHIOF");
                 window.location.reload();
             }
-
     }
 
     
     useEffect(() => {
-        let user = JSON.parse(localStorage.getItem('currentuser'));
-        let transactionIDs = user.transactions;
-        
-        let lended = 0;
-        let borrowed = 0;
-        loadPayLists();
 
-        async function loadPayLists(){
-            for(let transactionID of transactionIDs){
-                let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
+        let user;
+        let transactionIDs;
+        let friendIDs;
 
-                let res = await fetch(transactionURL);
-
-                if(res.status !== 200)
-                    throw new Error("Invalid transaction ID in user!");   
-                let transaction = await res.json();
-                
-                if(!transaction.isPaid){
-                    if(transaction.loaner === user._id){
-                        lended += transaction.amount;
-                    } else if(transaction.borrower === user._id) {
-                        borrowed += transaction.amount;
-                    } else {
-                        throw new Error("Error calculating balance!");
-                    }
-                }
-            }
-            setLended(lended);
-            setBorrowed(borrowed);
+        if(verified.current){
+            user = JSON.parse(sessionStorage.getItem('currentuser'));
+            transactionIDs = user.transactions;
+            friendIDs = user.friends;
+            
+            loadPayLists();
+            loadFriendList();
         }
-        let friendIDs = user.friends;
-        loadPayLists();
-        loadFriendList();
-
-
 
         // Load Transaction Lists
         async function loadPayLists(){
 
             let tempToBePaidList = [];
             let tempToPayList = [];
+            let tempLended = 0;
+            let tempBorrowed = 0;
 
             for(let transactionID of transactionIDs){
                 let transactionURL = `http://localhost:5050/record/transaction/${transactionID}`;
@@ -118,9 +109,11 @@ export default function Home(){
                     if(loaner.username === user.username){
                         entry.user = borrower.username;
                         tempToBePaidList.push(JSON.parse(JSON.stringify(entry)));
+                        tempLended += transaction.amount;
                     } else if(borrower.username === user.username) {
                         entry.user = loaner.username;
                         tempToPayList.push(JSON.parse(JSON.stringify(entry)));
+                        tempBorrowed += transaction.amount;
                     } else
                         throw new Error("Transaction doesn't involve current user!");
                 }
@@ -128,6 +121,8 @@ export default function Home(){
             }
             toPayList.current = tempToPayList;
             toBePaidList.current = tempToBePaidList;
+            lended.current = tempLended;
+            borrowed.current = tempBorrowed;
 
             console.log(tempToPayList);
             console.log(toPayList.current);
@@ -167,7 +162,7 @@ export default function Home(){
 
 
     const setFriendProfileID = async(id)=>{
-        localStorage.setItem("currentfriend",id);
+        sessionStorage.setItem("currentfriend",id);
     }
 
     // Create the elements based off the updated object lists
@@ -177,7 +172,7 @@ export default function Home(){
 
     let fetching = isFetching1.current || isFetching2.current;
 
-    if(fetching)
+    if(fetching || !verified.current)
         toPayElement = null;
     else if(toPayList.current.length === 0)
         toPayElement = (
@@ -310,7 +305,7 @@ export default function Home(){
         
         if (friendData) {
             let friendID = {id: friendData._id};
-            let currentUser = JSON.parse(localStorage.getItem('currentuser'));
+            let currentUser = JSON.parse(sessionStorage.getItem('currentuser'));
 
             if (friendID.id === currentUser._id) {
                 window.alert("Cannot add yourself.");
@@ -340,7 +335,7 @@ export default function Home(){
                 if(res.status === 200){
                     let user = await res.json();
                     console.log("updated user: ", user);
-                    localStorage.setItem('currentuser', JSON.stringify(user));
+                    sessionStorage.setItem('currentuser', JSON.stringify(user));
                 } else console.log("Error fetching user");
                 window.location.reload();
             }
@@ -353,13 +348,13 @@ export default function Home(){
             <HomeHeader/>
             <div className="ListScreens">
                 <div className="ToPayScreen">
-                    <label> You owe: ${borrowed}</label>
+                    <label> You owe: ${borrowed.current}</label>
                     <div className="ListContent">
                         <ul  className="payList">{toPayElement}</ul>
                     </div>
                 </div>
                 <div className="ToBePaidScreen">
-                    <label>You are owed: ${lended}</label>
+                    <label>You are owed: ${lended.current}</label>
                     <div className="ListContent">
                         <ul className="payList">{toBePaidElement}</ul>
                     </div>

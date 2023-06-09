@@ -15,12 +15,12 @@ export default function Login() {
 
 
   useEffect(() => {
-    if(localStorage.getItem("currentuser")){
+    if(sessionStorage.getItem("currentuser")){
       console.log("Login found user in local storage!");
       window.alert("Cannot access Login if you've signed in");
       navigate("/Home", {replace: true});
     }
-  }, []);
+  }, [navigate]);
 
 
   const handleSubmit = async (event) => {
@@ -52,8 +52,8 @@ export default function Login() {
         setErrorMessages({ name: "err_pass", message: login_errors.pass });
       } else {
         setIsSubmitted(true);
-        localStorage.setItem("currentuser", JSON.stringify(userData));
-        // let currentUser = JSON.parse(localStorage.getItem("currentuser"));
+        sessionStorage.setItem("currentuser", JSON.stringify(userData));
+        // let currentUser = JSON.parse(sessionStorage.getItem("currentuser"));
         // console.log("user(login) ", currentUser);
 
       }
