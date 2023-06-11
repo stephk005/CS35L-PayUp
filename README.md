@@ -25,7 +25,7 @@ cd CS35L-PayUp
 
 ## Setting up the backend: 
 
-Create a MongoDB account at https://cloud.mongodb.com/. Create a .env in the server directory, and write 'MONGO_DB_URI = YOUR_MONGO_DB_URI' to the file. 
+Create a MongoDB account at https://cloud.mongodb.com/. Create a .env in the server directory, and write 'MONGO_DB_URI = YOUR_MONGO_DB_URI' to the file. When the server is run, check to see if it is at http://localhost:5050
 
 ```
 cd server
